@@ -12,6 +12,7 @@
     <artifactId>edgeserver</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>edgeserver</name>
+    <packaging>jar</packaging>
     <description>Image manager projekt</description>
     <properties>
         <java.version>15</java.version>
@@ -53,6 +54,7 @@
     </dependencies>
 
     <build>
+        <finalName>app</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
