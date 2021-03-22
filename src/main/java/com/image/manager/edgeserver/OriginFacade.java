@@ -19,7 +19,6 @@ public class OriginFacade {
         this.converter = converter;
     }
 
-    @GetMapping(produces = MediaType.IMAGE_JPEG_VALUE)
     public Mono<byte[]> fetchImageFromOrigin() {
         return WebClient.create()
                 .get()
