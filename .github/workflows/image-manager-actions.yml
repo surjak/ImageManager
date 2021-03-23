@@ -33,3 +33,9 @@ jobs:
         with:
           push: true
           tags: aghimagemanager/image_manager:latest
+  deploy:
+    needs: push
+    runs-on: self-hosted
+    steps:
+      - name: Run script
+        run: sh /root/setupIM.sh
