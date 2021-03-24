@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,25 +19,18 @@ import java.util.List;
 public class ImageController {
 
     private final OriginFacade originFacade;
-//    private final ScaleService scaleService;
-//    private final CropService cropService;
 
     public ImageController(OriginFacade originFacade) {
         this.originFacade = originFacade;
     }
 
-    @GetMapping(value = "/{fileName}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    @GetMapping(value = "/{fileName}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public Mono<byte[]> getImage(@PathVariable String fileName, HttpServletRequest request) {
         Mono<byte[]> image = originFacade.fetchImageFromOrigin(fileName);
-        String params = request.getQueryString();
-        if (params != null) {
-            String[] operations = params.split("op=");
-            List<Operation> operationList = new LinkedList<>();
-            for (int i = 1; i < operations.length; i++) {
-                operationList.add(OperationFactory.fromQuery(operations[i]));
-            }
-        }
+        System.out.println(request.getQueryString());
+        List<Operation> operations = OperationFactory.fromQuery(request.getQueryString());
 
+        //TODO: run operations for image
 
         return image;
     }

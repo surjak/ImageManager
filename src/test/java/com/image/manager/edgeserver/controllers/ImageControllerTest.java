@@ -1,12 +1,9 @@
 package com.image.manager.edgeserver.controllers;
 
 import com.image.manager.edgeserver.OriginFacade;
-import com.image.manager.edgeserver.services.CropService;
-import com.image.manager.edgeserver.services.ScaleService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,19 +24,14 @@ class ImageControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private OriginFacade originFacade;
-    @MockBean
-    private CropService cropService;
-    @MockBean
-    private ScaleService scaleService;
 
     @Test
     void retrieveAppropriateFileName() throws Exception {
         //given
         String fileName = "logo_agh.png";
-        String params = "op=crop&w=20&h=20&h=10&op=scale&w=500&h=500";
 
         //when
-        mockMvc.perform(get("/" + fileName + "?" + params)
+        mockMvc.perform(get("/" + fileName)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 

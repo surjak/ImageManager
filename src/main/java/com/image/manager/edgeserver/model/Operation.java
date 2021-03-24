@@ -3,12 +3,16 @@ package com.image.manager.edgeserver.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class Operation {
+public abstract class Operation {
     private OperationType operationType;
-    private List<Integer> widths;
-    private List<Integer> heights;
+    private Map<String, Integer> arguments;
+
+    public Operation() {
+    }
+
+    public abstract byte[] doOperation(byte[] image);
 }

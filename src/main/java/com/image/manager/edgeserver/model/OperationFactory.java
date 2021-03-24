@@ -1,26 +1,39 @@
 package com.image.manager.edgeserver.model;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class OperationFactory {
 
-    public static Operation fromQuery(String query) {
+    public static List<Operation> fromQuery(String wholeQuery) {
+        if(wholeQuery != null) {
+            String[] operations = wholeQuery.split("op=");
+            List<Operation> operationList = new LinkedList<>();
+            for (int i = 1; i < operations.length; i++) {
+                operationList.add(OperationFactory.fromSubQuery(operations[i]));
+            }
+            return operationList;
+        }
+        return Collections.emptyList();
+    }
+
+    public static Operation fromSubQuery(String query) {
         String[] params = query.split("&");
+        Map<String, Integer> arguments = new HashMap<>();
         OperationType operationType = OperationType.valueOf(params[0].toUpperCase());
-        List<Integer> widths = new LinkedList<>();
-        List<Integer> heights = new LinkedList<>();
         for (int i = 1; i < params.length; i++) {
+
             String[] values = params[i].split("=");
             String key = values[0];
             String value = values[1];
-            if (key.startsWith("w")) {
-                widths.add(Integer.valueOf(value));
-            } else if (key.startsWith("h")) {
-                heights.add(Integer.valueOf(value));
-            }
+            arguments.put(key, Integer.valueOf(value));
         }
-        return new Operation(operationType, widths, heights);
+        return fromOperationAndArguments(operationType, arguments);
     }
 
+    private static Operation fromOperationAndArguments(OperationType operationType, Map<String, Integer> arguments) {
+        return switch (operationType) {
+            case CROP -> new CropOperation(operationType, arguments);
+            case SCALE -> new ScaleOperation(operationType, arguments);
+        };
+    }
 }
