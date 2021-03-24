@@ -1,5 +1,6 @@
 package com.image.manager.edgeserver;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,21 +14,15 @@ import reactor.core.publisher.Mono;
 @Service
 public class OriginFacade {
 
-    private final BufferedImageConverter converter;
+    @Value("${origin.host}")
+    private String originUrl;
 
-    public OriginFacade(BufferedImageConverter converter) {
-        this.converter = converter;
-    }
-
-    public Mono<byte[]> fetchImageFromOrigin() {
+    public Mono<byte[]> fetchImageFromOrigin(String imageName) {
         return WebClient.create()
                 .get()
-                .uri("https://origin-server.herokuapp.com/small-image.png")
+                .uri(originUrl + "/" + imageName)
                 .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG)
                 .retrieve()
-                .bodyToMono(byte[].class)
-                .map(converter::byteArrayToBufferedImage)
-                .map(image -> image.getSubimage(100, 100, 100, 100)) //service operation here
-                .map(converter::bufferedImageToByteArray);
+                .bodyToMono(byte[].class);
     }
 }
