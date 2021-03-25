@@ -2,14 +2,15 @@ package com.image.manager.edgeserver.model;
 
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
 import java.util.Map;
 
 @EqualsAndHashCode
 public class ScaleOperation implements Operation {
 
-    private final Map<String, Integer> arguments;
+    private final List<OperationArgument> arguments;
 
-    public ScaleOperation(Map<String, Integer> arguments) {
+    public ScaleOperation(List<OperationArgument> arguments) {
         this.arguments = arguments;
     }
 
@@ -19,7 +20,7 @@ public class ScaleOperation implements Operation {
         return null;
     }
 
-    public Map<String, Integer> getArguments() {
+    public List<OperationArgument> getArguments() {
         return arguments;
     }
 }

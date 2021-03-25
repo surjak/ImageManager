@@ -18,19 +18,19 @@ public class OperationFactory {
 
     public static Operation fromSubQuery(String query) {
         String[] params = query.split("&");
-        Map<String, Integer> arguments = new HashMap<>();
+        List<OperationArgument> arguments = new LinkedList<>();
         OperationType operationType = OperationType.valueOf(params[0].toUpperCase());
         for (int i = 1; i < params.length; i++) {
 
             String[] values = params[i].split("=");
             String key = values[0];
             String value = values[1];
-            arguments.put(key, Integer.valueOf(value));
+            arguments.add(new OperationArgument(key, Integer.valueOf(value)));
         }
         return fromOperationAndArguments(operationType, arguments);
     }
 
-    private static Operation fromOperationAndArguments(OperationType operationType, Map<String, Integer> arguments) {
+    private static Operation fromOperationAndArguments(OperationType operationType, List<OperationArgument> arguments) {
         return switch (operationType) {
             case CROP -> new CropOperation(arguments);
             case SCALE -> new ScaleOperation(arguments);

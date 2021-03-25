@@ -3,7 +3,6 @@ package com.image.manager.edgeserver.model;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,8 +14,8 @@ class OperationFactoryTest {
         //given
         String query = "op=crop&w=20&h=20&h=10&op=scale&w=500";
         List<Operation> expectedOperations = List.of(
-                new CropOperation(Map.of("w", 20, "h", 10)),
-                new ScaleOperation(Map.of("w", 500))
+                new CropOperation(List.of(new OperationArgument("w", 20), new OperationArgument("h", 10))),
+                new ScaleOperation(List.of(new OperationArgument("w", 500)))
         );
 
         //when
