@@ -3,7 +3,6 @@ package com.image.manager.edgeserver.model;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.Map;
 
 @EqualsAndHashCode
 public class CropOperation implements Operation {
