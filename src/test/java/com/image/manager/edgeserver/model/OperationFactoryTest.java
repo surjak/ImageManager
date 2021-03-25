@@ -15,8 +15,8 @@ class OperationFactoryTest {
         //given
         String query = "op=crop&w=20&h=20&h=10&op=scale&w=500";
         List<Operation> expectedOperations = List.of(
-                new CropOperation(OperationType.CROP, Map.of("w", 20, "h", 10)),
-                new ScaleOperation(OperationType.SCALE, Map.of("w", 500))
+                new CropOperation(Map.of("w", 20, "h", 10)),
+                new ScaleOperation(Map.of("w", 500))
         );
 
         //when

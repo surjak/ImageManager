@@ -5,14 +5,15 @@ import lombok.Data;
 
 import java.util.Map;
 
-@Data
-@AllArgsConstructor
-public abstract class Operation {
-    private OperationType operationType;
-    private Map<String, Integer> arguments;
+public interface Operation {
+//    private Map<String, Integer> arguments;
+//
+//    public Operation(OperationType operationType) {
+//        this.operationType = operationType;
+//    }
+//
+//    public Operation() {
+//    }
 
-    public Operation() {
-    }
-
-    public abstract byte[] doOperation(byte[] image);
+    byte[] execute(byte[] image);
 }

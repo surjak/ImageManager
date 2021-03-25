@@ -1,29 +1,25 @@
 package com.image.manager.edgeserver.model;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Map;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class ScaleOperation extends Operation {
-//    private Integer w;
-//    private Integer h;
-//
-//    public ScaleOperation(OperationType operationType, Integer w, Integer h) {
-//        super(operationType);
-//        this.w = w;
-//        this.h = h;
-//    }
+@EqualsAndHashCode
+public class ScaleOperation implements Operation {
 
-    public ScaleOperation(OperationType operationType, Map<String, Integer> arguments) {
-        super(operationType, arguments);
+    private final Map<String, Integer> arguments;
+
+    public ScaleOperation(Map<String, Integer> arguments) {
+        this.arguments = arguments;
     }
 
     @Override
-    public byte[] doOperation(byte[] image) {
+    public byte[] execute(byte[] image) {
         //TODO: implement this
         return null;
+    }
+
+    public Map<String, Integer> getArguments() {
+        return arguments;
     }
 }

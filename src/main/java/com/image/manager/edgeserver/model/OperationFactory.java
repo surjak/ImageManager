@@ -32,8 +32,8 @@ public class OperationFactory {
 
     private static Operation fromOperationAndArguments(OperationType operationType, Map<String, Integer> arguments) {
         return switch (operationType) {
-            case CROP -> new CropOperation(operationType, arguments);
-            case SCALE -> new ScaleOperation(operationType, arguments);
+            case CROP -> new CropOperation(arguments);
+            case SCALE -> new ScaleOperation(arguments);
         };
     }
 }
