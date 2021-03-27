@@ -1,5 +1,7 @@
 package com.image.manager.edgeserver.model;
 
+import java.awt.image.BufferedImage;
+
 public interface Operation {
-    byte[] execute(byte[] image);
+    BufferedImage execute(BufferedImage image);
 }
