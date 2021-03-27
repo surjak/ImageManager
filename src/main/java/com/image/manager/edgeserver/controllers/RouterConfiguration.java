@@ -27,16 +27,15 @@ public class RouterConfiguration {
 
     private final OriginFacade originFacade;
     private final OperationFactory operationFactory;
-    private final BufferedImageConverter imageConverter;
 
-    public RouterConfiguration(OriginFacade originFacade, OperationFactory operationFactory, BufferedImageConverter imageConverter) {
+    public RouterConfiguration(OriginFacade originFacade, OperationFactory operationFactory) {
         this.originFacade = originFacade;
         this.operationFactory = operationFactory;
-        this.imageConverter = imageConverter;
     }
 
     /**
      * Example usage for now:
+     * http://localhost:8080/small-image.png
      * http://localhost:8080/small-image.png?op=crop&w=50&h=50&x=50&y=50
      * http://localhost:8080/small-image.png?op=scale&w=700&h=700
      * http://localhost:8080/small-image.png?op=scale&w=700&h=700&op=crop&w=50&h=50&x=50&y=50 combo :)
@@ -50,18 +49,7 @@ public class RouterConfiguration {
                             String fileName = serverRequest.pathVariable("fileName");
                             return ok()
                                     .contentType(MediaType.IMAGE_PNG)
-                                    .body(getImageAndApplyOperations(operations, fileName), byte[].class);
+                                    .body(originFacade.getImageAndApplyOperations(fileName, operations), byte[].class);
                         });
-    }
-
-    private Mono<byte[]> getImageAndApplyOperations(List<Operation> operations, String fileName) {
-        return originFacade.fetchImageFromOrigin(fileName)
-                                        .map(imageConverter::byteArrayToBufferedImage)
-                                        .flatMap(img -> applyOperationsOnImage(operations, img)).map(imageConverter::bufferedImageToByteArray);
-    }
-
-    private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img) {
-        return Flux.fromIterable(operations)
-                .reduce(img, (i, operation) -> operation.execute(i));
     }
 }
