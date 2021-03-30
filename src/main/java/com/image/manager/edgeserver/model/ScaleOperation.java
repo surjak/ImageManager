@@ -1,26 +1,31 @@
 package com.image.manager.edgeserver.model;
 
 import lombok.EqualsAndHashCode;
+import org.imgscalr.Scalr;
 
-import java.util.List;
+import java.awt.image.BufferedImage;
 import java.util.Map;
 
 @EqualsAndHashCode
 public class ScaleOperation implements Operation {
+    public static final String W = "w";
+    public static final String H = "h";
+    private final Integer w;
+    private final Integer h;
 
-    private final List<OperationArgument> arguments;
+    public ScaleOperation(Integer w, Integer h) {
+        this.w = w;
+        this.h = h;
+    }
 
-    public ScaleOperation(List<OperationArgument> arguments) {
-        this.arguments = arguments;
+    public static ScaleOperation fromArgumentsMap(Map<String, Integer> arguments) {
+        Integer w = arguments.get(W);
+        Integer h = arguments.get(H);
+        return new ScaleOperation(w, h);
     }
 
     @Override
-    public byte[] execute(byte[] image) {
-        //TODO: implement this
-        return null;
-    }
-
-    public List<OperationArgument> getArguments() {
-        return arguments;
+    public BufferedImage execute(BufferedImage image) {
+        return Scalr.resize(image, w, h);
     }
 }

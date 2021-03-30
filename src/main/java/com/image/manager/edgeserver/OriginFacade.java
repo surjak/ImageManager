@@ -1,11 +1,16 @@
 package com.image.manager.edgeserver;
 
+import com.image.manager.edgeserver.model.Operation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.awt.image.BufferedImage;
+import java.util.List;
 
 
 /**
@@ -17,6 +22,18 @@ public class OriginFacade {
     @Value("${origin.host}")
     private String originUrl;
 
+    private final BufferedImageConverter imageConverter;
+
+    public OriginFacade(BufferedImageConverter imageConverter) {
+        this.imageConverter = imageConverter;
+    }
+
+    public Mono<byte[]> getImageAndApplyOperations(String fileName, List<Operation> operations) {
+        return fetchImageFromOrigin(fileName)
+                .map(imageConverter::byteArrayToBufferedImage)
+                .flatMap(img -> applyOperationsOnImage(operations, img)).map(imageConverter::bufferedImageToByteArray);
+    }
+
     public Mono<byte[]> fetchImageFromOrigin(String imageName) {
         return WebClient.create()
                 .get()
@@ -24,5 +41,10 @@ public class OriginFacade {
                 .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG)
                 .retrieve()
                 .bodyToMono(byte[].class);
+    }
+
+    private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img) {
+        return Flux.fromIterable(operations)
+                .reduce(img, (i, operation) -> operation.execute(i));
     }
 }
