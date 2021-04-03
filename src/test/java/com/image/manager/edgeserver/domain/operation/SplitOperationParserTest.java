@@ -1,9 +1,6 @@
 package com.image.manager.edgeserver.domain.operation;
 
-import com.image.manager.edgeserver.domain.operation.CropOperation;
-import com.image.manager.edgeserver.domain.operation.Operation;
-import com.image.manager.edgeserver.domain.operation.OperationFactory;
-import com.image.manager.edgeserver.domain.operation.ScaleOperation;
+import com.image.manager.edgeserver.domain.operation.parser.split.SplitOperationParser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,10 +11,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-class OperationFactoryTest {
+class SplitOperationParserTest {
 
     @Autowired
-    private OperationFactory operationFactory;
+    private SplitOperationParser operationFactory;
 
     @Test
     void parseQueryParams() {

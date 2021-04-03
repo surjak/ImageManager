@@ -1,8 +1,9 @@
 package com.image.manager.edgeserver.application.config;
 
+import com.image.manager.edgeserver.domain.operation.parser.OperationParser;
 import com.image.manager.edgeserver.domain.origin.OriginFacade;
 import com.image.manager.edgeserver.domain.operation.Operation;
-import com.image.manager.edgeserver.domain.operation.OperationFactory;
+import com.image.manager.edgeserver.domain.operation.parser.split.SplitOperationParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -22,11 +23,11 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 public class RouterConfiguration {
 
     private final OriginFacade originFacade;
-    private final OperationFactory operationFactory;
+    private final OperationParser operationParser;
 
-    public RouterConfiguration(OriginFacade originFacade, OperationFactory operationFactory) {
+    public RouterConfiguration(OriginFacade originFacade, OperationParser operationParser) {
         this.originFacade = originFacade;
-        this.operationFactory = operationFactory;
+        this.operationParser = operationParser;
     }
 
     /**
@@ -41,7 +42,7 @@ public class RouterConfiguration {
         return RouterFunctions
                 .route(GET("/{fileName}"),
                         serverRequest -> {
-                            List<Operation> operations = operationFactory.fromQuery(serverRequest.uri().getQuery());
+                            List<Operation> operations = operationParser.fromQuery(serverRequest.uri().getQuery());
                             String fileName = serverRequest.pathVariable("fileName");
                             return ok()
                                     .contentType(MediaType.IMAGE_PNG)
