@@ -1,10 +1,10 @@
-package com.image.manager.edgeserver;
+package com.image.manager.edgeserver.domain.origin;
 
-import com.image.manager.edgeserver.model.Operation;
+import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
+import com.image.manager.edgeserver.domain.operation.Operation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

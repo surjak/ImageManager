@@ -1,4 +1,4 @@
-package com.image.manager.edgeserver.exception;
+package com.image.manager.edgeserver.api;
 
 import org.springframework.http.HttpStatus;
 

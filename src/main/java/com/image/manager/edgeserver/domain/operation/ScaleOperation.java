@@ -1,4 +1,4 @@
-package com.image.manager.edgeserver.model;
+package com.image.manager.edgeserver.domain.operation;
 
 import lombok.EqualsAndHashCode;
 import org.imgscalr.Scalr;

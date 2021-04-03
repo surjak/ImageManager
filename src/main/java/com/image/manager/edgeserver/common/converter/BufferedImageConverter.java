@@ -1,4 +1,4 @@
-package com.image.manager.edgeserver;
+package com.image.manager.edgeserver.common.converter;
 
 import org.springframework.stereotype.Component;
 
