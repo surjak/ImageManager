@@ -1,19 +1,15 @@
-package com.image.manager.edgeserver.controllers;
+package com.image.manager.edgeserver.application.config;
 
-import com.image.manager.edgeserver.BufferedImageConverter;
-import com.image.manager.edgeserver.OriginFacade;
-import com.image.manager.edgeserver.model.Operation;
-import com.image.manager.edgeserver.model.OperationFactory;
+import com.image.manager.edgeserver.domain.origin.OriginFacade;
+import com.image.manager.edgeserver.domain.operation.Operation;
+import com.image.manager.edgeserver.domain.operation.OperationFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;

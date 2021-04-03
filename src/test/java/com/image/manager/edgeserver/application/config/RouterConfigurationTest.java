@@ -1,12 +1,11 @@
-package com.image.manager.edgeserver.controllers;
+package com.image.manager.edgeserver.application.config;
 
-import com.image.manager.edgeserver.BufferedImageConverter;
-import com.image.manager.edgeserver.OriginFacade;
-import com.image.manager.edgeserver.model.OperationFactory;
+import com.image.manager.edgeserver.application.config.RouterConfiguration;
+import com.image.manager.edgeserver.domain.origin.OriginFacade;
+import com.image.manager.edgeserver.domain.operation.OperationFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
