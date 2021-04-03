@@ -1,6 +1,8 @@
 package com.image.manager.edgeserver.domain.operation;
 
+import com.image.manager.edgeserver.domain.operation.parser.OperationParser;
 import com.image.manager.edgeserver.domain.operation.parser.split.SplitOperationParser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,11 +12,15 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
 class SplitOperationParserTest {
 
-    @Autowired
-    private SplitOperationParser operationFactory;
+    private OperationParser operationParser;
+
+    @BeforeEach
+    void setUp() {
+        var operationFactory = new OperationFactory(List.of(new CropOperation.Factory(), new ScaleOperation.Factory()));
+        this.operationParser = new SplitOperationParser(operationFactory);
+    }
 
     @Test
     void parseQueryParams() {
@@ -26,7 +32,7 @@ class SplitOperationParserTest {
         );
 
         //when
-        List<Operation> actualOperations = operationFactory.fromQuery(query);
+        List<Operation> actualOperations = operationParser.fromQuery(query);
 
         //then
         assertThat(actualOperations.size()).isEqualTo(expectedOperations.size());
@@ -39,6 +45,6 @@ class SplitOperationParserTest {
         String query = "op=BADTYPE&w=500&x=20";
 
         //when then
-        assertThrows(IllegalArgumentException.class, () -> operationFactory.fromQuery(query));
+        assertThrows(IllegalArgumentException.class, () -> operationParser.fromQuery(query));
     }
 }
