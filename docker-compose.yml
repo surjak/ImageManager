@@ -1,0 +1,14 @@
+version: '3'
+services:
+  spring-boot:
+    image: "aghimagemanager/image_manager"
+    ports:
+      - "8080:8080"
+    container_name: spring-boot
+  prometheus:
+    image: "prom/prometheus"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    container_name: prometheus
