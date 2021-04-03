@@ -1,12 +1,10 @@
 package com.image.manager.edgeserver.controllers;
 
-import com.image.manager.edgeserver.BufferedImageConverter;
 import com.image.manager.edgeserver.OriginFacade;
 import com.image.manager.edgeserver.model.OperationFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,8 +16,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = RouterConfiguration.class)
-class RouterConfigurationTest {
+@WebFluxTest(controllers = ImageRouter.class)
+class ImageRouterTest {
 
     @Autowired
     private WebTestClient webTestClient;
@@ -29,7 +27,7 @@ class RouterConfigurationTest {
     private OperationFactory operationFactory;
 
     @Test
-    void retrieveAppropriateFileName() throws Exception {
+    void retrieveAppropriateFileName() {
         //given
         String fileName = "logo_agh.png";
 
