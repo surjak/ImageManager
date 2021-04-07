@@ -1,4 +1,4 @@
-name: image-manager-actions
+name: image-manager-actions-dev
 on:
   push:
     branches: [ develop ]
