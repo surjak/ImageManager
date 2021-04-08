@@ -1,10 +1,10 @@
 package com.image.manager.edgeserver.domain.origin;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
 import com.image.manager.edgeserver.domain.operation.Operation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,18 +26,14 @@ public class OriginFacade {
     @Value("${origin.host}")
     private String originUrl;
     private final WebClient webClient;
-    private final Cache<String, byte[]> requestCache;
+    private final RedisTemplate<String, byte[]> redisTemplate;
 
     private final BufferedImageConverter imageConverter;
 
-    public OriginFacade(BufferedImageConverter imageConverter) {
+    public OriginFacade(RedisTemplate<String, byte[]> redisTemplate, BufferedImageConverter imageConverter) {
+        this.redisTemplate = redisTemplate;
         webClient = WebClient.create();
         this.imageConverter = imageConverter;
-        this.requestCache = Caffeine.newBuilder()
-                .maximumSize(1000)
-                .expireAfterWrite(Duration.ofMinutes(10))
-                .build();
-
     }
 
     public Mono<byte[]> getImageAndApplyOperations(String fileName, List<Operation> operations) {
@@ -47,8 +43,9 @@ public class OriginFacade {
     }
 
     public Mono<byte[]> fetchImageFromOrigin(String imageName) {
-        byte[] bytes = requestCache.getIfPresent(imageName);
-        if (bytes != null) {
+        ValueOperations<String, byte[]> valueOperations = redisTemplate.opsForValue();
+        if (redisTemplate.hasKey(imageName).booleanValue()) {
+            byte[] bytes = valueOperations.get(imageName);
             return Mono.just(bytes);
         }
         return webClient
@@ -58,7 +55,7 @@ public class OriginFacade {
                 .retrieve()
                 .bodyToMono(byte[].class)
                 .subscribeOn(Schedulers.boundedElastic())
-                .doOnSuccess(b -> requestCache.put(imageName, b));
+                .doOnSuccess(b -> valueOperations.set(imageName, b));
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img) {
