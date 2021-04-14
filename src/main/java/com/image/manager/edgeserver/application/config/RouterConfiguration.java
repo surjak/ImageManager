@@ -2,8 +2,6 @@ package com.image.manager.edgeserver.application.config;
 
 import com.image.manager.edgeserver.domain.operation.parser.OperationParser;
 import com.image.manager.edgeserver.domain.origin.OriginFacade;
-import com.image.manager.edgeserver.domain.operation.Operation;
-import com.image.manager.edgeserver.domain.operation.parser.split.SplitOperationParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -12,10 +10,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
-import static org.springframework.web.reactive.function.server.ServerResponse.notFound;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 /**

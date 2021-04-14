@@ -37,4 +37,4 @@ jobs:
     runs-on: prod
     steps:
       - name: Run script
-        run: sh /root/setupIM.sh
+        run: sh setupIM.sh
