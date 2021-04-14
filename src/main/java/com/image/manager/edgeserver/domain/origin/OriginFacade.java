@@ -1,8 +1,12 @@
 package com.image.manager.edgeserver.domain.origin;
 
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
+import com.image.manager.edgeserver.domain.ImageNotFoundException;
 import com.image.manager.edgeserver.domain.operation.Operation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,10 +25,14 @@ public class OriginFacade {
 
     @Value("${origin.host}")
     private String originUrl;
+    private final WebClient webClient;
+    private final RedisTemplate<String, byte[]> redisTemplate;
 
     private final BufferedImageConverter imageConverter;
 
-    public OriginFacade(BufferedImageConverter imageConverter) {
+    public OriginFacade(RedisTemplate<String, byte[]> redisTemplate, BufferedImageConverter imageConverter) {
+        this.redisTemplate = redisTemplate;
+        webClient = WebClient.create();
         this.imageConverter = imageConverter;
     }
 
@@ -35,12 +43,21 @@ public class OriginFacade {
     }
 
     public Mono<byte[]> fetchImageFromOrigin(String imageName) {
-        return WebClient.create()
+        ValueOperations<String, byte[]> valueOperations = redisTemplate.opsForValue();
+        if (redisTemplate.hasKey(imageName).booleanValue()) {
+            byte[] bytes = valueOperations.get(imageName);
+            return Mono.just(bytes);
+        }
+        return webClient
                 .get()
                 .uri(originUrl + "/" + imageName)
                 .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG)
                 .retrieve()
-                .bodyToMono(byte[].class);
+                .onStatus(HttpStatus::is4xxClientError, clientResponse ->
+                        Mono.error(new ImageNotFoundException("Image not found"))
+                )
+                .bodyToMono(byte[].class)
+                .doOnSuccess(b -> valueOperations.set(imageName, b));
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img) {

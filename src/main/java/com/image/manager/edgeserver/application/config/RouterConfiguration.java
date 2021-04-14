@@ -2,16 +2,13 @@ package com.image.manager.edgeserver.application.config;
 
 import com.image.manager.edgeserver.domain.operation.parser.OperationParser;
 import com.image.manager.edgeserver.domain.origin.OriginFacade;
-import com.image.manager.edgeserver.domain.operation.Operation;
-import com.image.manager.edgeserver.domain.operation.parser.split.SplitOperationParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
-
-import java.util.List;
+import reactor.core.publisher.Mono;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
@@ -41,12 +38,10 @@ public class RouterConfiguration {
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
                 .route(GET("/{fileName}"),
-                        serverRequest -> {
-                            List<Operation> operations = operationParser.fromQuery(serverRequest.uri().getQuery());
-                            String fileName = serverRequest.pathVariable("fileName");
-                            return ok()
-                                    .contentType(MediaType.IMAGE_PNG)
-                                    .body(originFacade.getImageAndApplyOperations(fileName, operations), byte[].class);
-                        });
+                        serverRequest ->
+                                Mono.zip(Mono.justOrEmpty(serverRequest.uri().getQuery()).map(operationParser::fromQuery).switchIfEmpty(Mono.just(java.util.List.of())), Mono.justOrEmpty(serverRequest.pathVariable("fileName")))
+                                        .map(a -> originFacade.getImageAndApplyOperations(a.getT2(), a.getT1()))
+                                        .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))
+                );
     }
 }
