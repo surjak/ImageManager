@@ -1,19 +1,19 @@
 package com.image.manager.edgeserver.domain.origin;
 
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
+import com.image.manager.edgeserver.domain.ImageNotFoundException;
 import com.image.manager.edgeserver.domain.operation.Operation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.awt.image.BufferedImage;
-import java.time.Duration;
 import java.util.List;
 
 
@@ -53,8 +53,10 @@ public class OriginFacade {
                 .uri(originUrl + "/" + imageName)
                 .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG)
                 .retrieve()
+                .onStatus(HttpStatus::is4xxClientError, clientResponse ->
+                        Mono.error(new ImageNotFoundException("Image not found"))
+                )
                 .bodyToMono(byte[].class)
-                .subscribeOn(Schedulers.boundedElastic())
                 .doOnSuccess(b -> valueOperations.set(imageName, b));
     }
 
