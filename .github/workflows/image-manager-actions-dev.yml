@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          build-args: dev
+          build-args: env=dev
           tags: aghimagemanager/image_manager:latest
   deploy:
     needs: push
