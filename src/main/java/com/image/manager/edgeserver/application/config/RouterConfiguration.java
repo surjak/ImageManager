@@ -1,7 +1,10 @@
 package com.image.manager.edgeserver.application.config;
 
+import com.image.manager.edgeserver.domain.operation.Operation;
 import com.image.manager.edgeserver.domain.operation.parser.OperationParser;
 import com.image.manager.edgeserver.domain.origin.OriginFacade;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -9,6 +12,8 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
@@ -44,4 +49,18 @@ public class RouterConfiguration {
                                         .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))
                 );
     }
+//    @Bean
+//    public RouterFunction<ServerResponse> route() {
+//        return RouterFunctions
+//                .route(GET("/{fileName}"),
+//                        serverRequest -> {
+//                            timer.recordCallable(() -> {
+//                                List<Operation> operations = operationParser.fromQuery(serverRequest.uri().getQuery());
+//                                String fileName = serverRequest.pathVariable("fileName");
+//                                return ok()
+//                                        .contentType(MediaType.IMAGE_PNG)
+//                                        .body(originFacade.getImageAndApplyOperations(fileName, operations), byte[].class);
+//                            });
+//                        });
+//    }
 }
