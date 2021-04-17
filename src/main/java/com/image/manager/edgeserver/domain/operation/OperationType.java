@@ -11,7 +11,7 @@ public enum OperationType {
         return Stream.of(values())
                 .filter(e -> e.name().equalsIgnoreCase(name))
                 .findAny()
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException("Invalid operation type"));
     }
 
 }

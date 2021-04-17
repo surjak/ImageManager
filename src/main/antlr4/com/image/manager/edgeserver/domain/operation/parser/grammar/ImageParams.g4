@@ -1,9 +1,10 @@
 grammar ImageParams;
 
+fragment NEGATIVE_SIGN : '-';
 fragment DIGIT : [0-9];
 fragment LETTER : [A-Za-z];
 
-NUMBER: DIGIT+;
+NUMBER: NEGATIVE_SIGN? DIGIT+;
 TEXT   : LETTER+ ;
 CRLF : '\r'? '\n' | '\r';
 

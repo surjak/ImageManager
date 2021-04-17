@@ -1,5 +1,6 @@
 package com.image.manager.edgeserver.domain.operation;
 
+import com.google.common.base.Preconditions;
 import lombok.EqualsAndHashCode;
 import org.imgscalr.Scalr;
 import org.springframework.stereotype.Component;
@@ -8,10 +9,10 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 @EqualsAndHashCode
-public class ScaleOperation implements Operation {
+public class ScaleOperation extends Operation {
 
-    private final Integer w;
-    private final Integer h;
+    private Integer w;
+    private Integer h;
 
     public ScaleOperation(Integer w, Integer h) {
         this.w = w;
@@ -19,8 +20,31 @@ public class ScaleOperation implements Operation {
     }
 
     @Override
-    public BufferedImage execute(BufferedImage image) {
+    protected BufferedImage processImage(BufferedImage image) {
+        fixMissingProperties(image);
         return Scalr.resize(image, w, h);
+    }
+
+    @Override
+    protected void fixMissingProperties(BufferedImage image) {
+        if (this.w == null && this.h == null) {
+            this.w = image.getWidth();
+            this.h = image.getHeight();
+        }
+
+        final var ratio = image.getWidth() / image.getHeight();
+
+        this.w = this.w != null ? this.w : this.h * ratio;
+        this.h = this.h != null ? this.h : this.w / ratio;
+    }
+
+    @Override
+    protected void validateProperties(BufferedImage image) {
+        Preconditions.checkArgument(w >= MIN_IMAGE_SIZE, "Target width cannot be negative");
+        Preconditions.checkArgument(w <= MAX_IMAGE_SIZE, "Target width cannot be larger than 2^16");
+
+        Preconditions.checkArgument(h >= MIN_IMAGE_SIZE, "Target height cannot be negative");
+        Preconditions.checkArgument(h <= MAX_IMAGE_SIZE, "Target height cannot be larger than 2^16");
     }
 
     @Component
