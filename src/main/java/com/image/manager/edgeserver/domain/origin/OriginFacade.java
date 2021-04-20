@@ -30,9 +30,9 @@ public class OriginFacade {
 
     private final BufferedImageConverter imageConverter;
 
-    public OriginFacade(RedisTemplate<String, byte[]> redisTemplate, BufferedImageConverter imageConverter) {
+    public OriginFacade(WebClient webClient, RedisTemplate<String, byte[]> redisTemplate, BufferedImageConverter imageConverter) {
+        this.webClient = webClient;
         this.redisTemplate = redisTemplate;
-        webClient = WebClient.create();
         this.imageConverter = imageConverter;
     }
 
