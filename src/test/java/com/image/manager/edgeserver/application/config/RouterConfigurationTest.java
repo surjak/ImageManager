@@ -2,6 +2,7 @@ package com.image.manager.edgeserver.application.config;
 
 import com.image.manager.edgeserver.domain.origin.OriginFacade;
 import com.image.manager.edgeserver.domain.operation.parser.split.SplitOperationParser;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,6 +27,7 @@ class RouterConfigurationTest {
     @MockBean
     private SplitOperationParser operationFactory;
 
+    @Disabled
     @Test
     void retrieveAppropriateFileName() throws Exception {
         //given
