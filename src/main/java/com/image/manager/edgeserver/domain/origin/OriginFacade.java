@@ -50,7 +50,7 @@ public class OriginFacade {
     @SneakyThrows
     public Mono<byte[]> fetchImageFromOrigin(String imageName) {
         ValueOperations<String, byte[]> valueOperations = redisTemplate.opsForValue();
-        if (redisTemplate.hasKey(imageName)) {
+        if (redisTemplate.hasKey(imageName).booleanValue()) {
             byte[] bytes = valueOperations.get(imageName);
             return Mono.just(bytes);
         }
@@ -59,7 +59,7 @@ public class OriginFacade {
         var result = webClient
                 .get()
                 .uri(uri)
-                .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG, MediaType.ALL)
+                .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
                             return Mono.error(new ImageNotFoundException("Image not found"));
