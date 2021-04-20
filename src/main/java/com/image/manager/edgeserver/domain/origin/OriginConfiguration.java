@@ -7,7 +7,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,16 +23,29 @@ public class OriginConfiguration {
     @Bean
     public OriginFacade originFacade(OriginProperties originProperties,
                                      RedisTemplate<String, byte[]> redisTemplate,
-                                     BufferedImageConverter imageConverter,
-                                     WebClient webClient) {
+                                     BufferedImageConverter imageConverter) {
+
         return new OriginFacade(
                 redisTemplate,
                 imageConverter,
                 originProperties.getHosts()
                         .stream()
-                        .map(host -> new Origin(host, webClient))
+                        .map(host -> new Origin(host, initWebClient(host.getMaxConcurrentConnections())))
                         .collect(Collectors.toList())
         );
+    }
+
+    public WebClient initWebClient(int maxNumberOfConnections) {
+        ConnectionProvider connectionProvider = ConnectionProvider.builder("connectionProvider").maxConnections(maxNumberOfConnections).build();
+        HttpClient httpClient = HttpClient.create(connectionProvider);
+        ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
+        return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()
+                .codecs(configurer -> configurer
+                        .defaultCodecs()
+                        .maxInMemorySize(16 * 1024 * 1024))
+                .build())
+                .clientConnector(connector)
+                .build();
     }
 
     @Bean

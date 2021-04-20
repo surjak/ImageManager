@@ -30,6 +30,8 @@ public class RouterConfiguration {
     }
 
     /**
+     * curl -v "3.64.252.146:8080/COCO_train2014_000000061203.jpg" --resolve "3.64.252.146:8080:127.0.0.1"
+     * <p>
      * Example usage for now:
      * http://localhost:8080/small-image.png
      * http://localhost:8080/small-image.png?op=crop&w=50&h=50&x=50&y=50

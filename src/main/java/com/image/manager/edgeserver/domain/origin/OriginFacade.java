@@ -44,7 +44,7 @@ public class OriginFacade {
     }
 
     public Mono<byte[]> getImageAndApplyOperations(String host, String fileName, List<Operation> operations) {
-        log.info("host: {}", host);
+
         return fetchImageFromOrigin(host, fileName)
                 .map(imageConverter::byteArrayToBufferedImage)
                 .flatMap(img -> applyOperationsOnImage(operations, img)).map(imageConverter::bufferedImageToByteArray);
