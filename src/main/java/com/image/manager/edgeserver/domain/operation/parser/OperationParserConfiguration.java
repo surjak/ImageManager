@@ -11,12 +11,12 @@ import org.springframework.context.annotation.Primary;
 public class OperationParserConfiguration {
 
     @Bean
-    @Primary
     public OperationParser splitOperationParser(OperationFactory operationFactory) {
         return new SplitOperationParser(operationFactory);
     }
 
     @Bean
+    @Primary
     public OperationParser grammarOperationParser(OperationFactory operationFactory) {
         return new GrammarOperationParser(operationFactory);
     }

@@ -22,6 +22,10 @@ public class IMExceptionHandler implements WebExceptionHandler {
             serverWebExchange.getResponse().setStatusCode(HttpStatus.NOT_FOUND);
             return serverWebExchange.getResponse().setComplete();
         }
+        if(throwable instanceof IllegalArgumentException) {
+            serverWebExchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
+            return serverWebExchange.getResponse().setComplete();
+        }
         return Mono.error(throwable);
     }
 }
