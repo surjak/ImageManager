@@ -58,18 +58,19 @@ public class OriginFacade {
         }
 
         log.info("Call origin: {}", originUrl);
+
         var uri = new URI(originUrl + "/" + imageName.trim());
         var result = webClient
                 .get()
                 .uri(uri)
                 .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG, MediaType.ALL)
                 .retrieve()
-//                .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
-//                            log.info("error: {}", clientResponse);
-//                            log.info("code: {}", clientResponse.statusCode());
-//                            return Mono.error(new ImageNotFoundException("Image not found"));
-//                        }
-//                )
+                .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
+                            log.info("error: {}", clientResponse);
+                            log.info("code: {}", clientResponse.statusCode());
+                            return Mono.error(new ImageNotFoundException("Image not found"));
+                        }
+                )
                 .bodyToMono(byte[].class)
                 .doOnSuccess(b -> valueOperations.set(imageName, b));
 

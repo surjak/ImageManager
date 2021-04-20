@@ -6,6 +6,7 @@ import org.imgscalr.Scalr;
 import org.springframework.stereotype.Component;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.util.Map;
 
 @EqualsAndHashCode
@@ -22,7 +23,7 @@ public class ScaleOperation extends Operation {
     @Override
     protected BufferedImage processImage(BufferedImage image) {
         fixMissingProperties(image);
-        return Scalr.resize(image, w, h);
+        return Scalr.resize(image, Scalr.Mode.FIT_EXACT, w, h);
     }
 
     @Override
