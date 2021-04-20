@@ -40,9 +40,17 @@ public class RouterConfiguration {
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
                 .route(GET("/{fileName}"),
-                        serverRequest -> Mono.zip(Mono.justOrEmpty(serverRequest.uri().getQuery()).map(operationParser::fromQuery).switchIfEmpty(Mono.just(java.util.List.of())), Mono.justOrEmpty(serverRequest.pathVariable("fileName")))
-                                .map(a -> originFacade.getImageAndApplyOperations(a.getT2(), a.getT1()))
-                                .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))
+                        serverRequest ->
+                                Mono.zip(
+                                        Mono.justOrEmpty(serverRequest.uri().getQuery())
+                                                .map(operationParser::fromQuery)
+                                                .switchIfEmpty(Mono.just(java.util.List.of())),
+                                        Mono.justOrEmpty(serverRequest.pathVariable("fileName")),
+                                        Mono.justOrEmpty(serverRequest.uri().getHost())
+                                )
+                                        .map(a -> originFacade.getImageAndApplyOperations(a.getT3(), a.getT2(), a.getT1()))
+                                        .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))
+
                 );
     }
 }

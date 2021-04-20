@@ -1,0 +1,11 @@
+origins:
+  hosts:
+    - url: origin-server.herokuapp.com
+      maxConcurrentConnections: 10
+    - url: origin-server2.herokuapp.com
+      maxConcurrentConnections: 10
+
+spring:
+  redis:
+    host: localhost
+    port: 6379
