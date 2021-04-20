@@ -2,6 +2,7 @@ package com.image.manager.edgeserver.application.config;
 
 import com.image.manager.edgeserver.domain.operation.parser.OperationParser;
 import com.image.manager.edgeserver.domain.origin.OriginFacade;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 /**
  * Created by surjak on 25.03.2021
  */
+@Slf4j
 @Configuration
 public class RouterConfiguration {
 
@@ -38,10 +40,12 @@ public class RouterConfiguration {
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
                 .route(GET("/{fileName}"),
-                        serverRequest ->
-                                Mono.zip(Mono.justOrEmpty(serverRequest.uri().getQuery()).map(operationParser::fromQuery).switchIfEmpty(Mono.just(java.util.List.of())), Mono.justOrEmpty(serverRequest.pathVariable("fileName")))
-                                        .map(a -> originFacade.getImageAndApplyOperations(a.getT2(), a.getT1()))
-                                        .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))
+                        serverRequest -> {
+                            log.info("fileName: {}", serverRequest.pathVariable("fileName"));
+                            return Mono.zip(Mono.justOrEmpty(serverRequest.uri().getQuery()).map(operationParser::fromQuery).switchIfEmpty(Mono.just(java.util.List.of())), Mono.justOrEmpty(serverRequest.pathVariable("fileName")))
+                                    .map(a -> originFacade.getImageAndApplyOperations(a.getT2(), a.getT1()))
+                                    .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class));
+                        }
                 );
     }
 }

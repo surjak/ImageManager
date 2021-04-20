@@ -3,6 +3,8 @@ package com.image.manager.edgeserver.domain.origin;
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
 import com.image.manager.edgeserver.domain.ImageNotFoundException;
 import com.image.manager.edgeserver.domain.operation.Operation;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -14,12 +16,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.awt.image.BufferedImage;
+import java.net.URI;
 import java.util.List;
 
 
 /**
  * Created by surjak on 22.03.2021
  */
+
+@Slf4j
 @Service
 public class OriginFacade {
 
@@ -42,22 +47,34 @@ public class OriginFacade {
                 .flatMap(img -> applyOperationsOnImage(operations, img)).map(imageConverter::bufferedImageToByteArray);
     }
 
+    @SneakyThrows
     public Mono<byte[]> fetchImageFromOrigin(String imageName) {
+        log.info("Fetch from origin: {}", imageName);
         ValueOperations<String, byte[]> valueOperations = redisTemplate.opsForValue();
-        if (redisTemplate.hasKey(imageName).booleanValue()) {
+        if (redisTemplate.hasKey(imageName)) {
             byte[] bytes = valueOperations.get(imageName);
+            log.info("From redis");
             return Mono.just(bytes);
         }
-        return webClient
+
+        log.info("Call origin: {}", originUrl);
+        var uri = new URI(originUrl + "/" + imageName.trim());
+        var result = webClient
                 .get()
-                .uri(originUrl + "/" + imageName)
-                .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG)
+                .uri(uri)
+                .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG, MediaType.ALL)
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError, clientResponse ->
-                        Mono.error(new ImageNotFoundException("Image not found"))
-                )
+//                .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
+//                            log.info("error: {}", clientResponse);
+//                            log.info("code: {}", clientResponse.statusCode());
+//                            return Mono.error(new ImageNotFoundException("Image not found"));
+//                        }
+//                )
                 .bodyToMono(byte[].class)
                 .doOnSuccess(b -> valueOperations.set(imageName, b));
+
+        log.info("result: {}", result);
+        return result;
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img) {
