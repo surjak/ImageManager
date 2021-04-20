@@ -39,7 +39,7 @@ class RouterConfigurationTest {
                 .expectBody(byte[].class);
         //then
         ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
-        verify(originFacade).getImageAndApplyOperations(fileNameCaptor.capture(), any());
+        verify(originFacade).getImageAndApplyOperations("", fileNameCaptor.capture(), any());
         assertThat(fileNameCaptor.getValue()).isEqualTo(fileName);
     }
 }
