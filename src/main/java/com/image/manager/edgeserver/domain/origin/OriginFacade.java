@@ -49,15 +49,11 @@ public class OriginFacade {
 
     @SneakyThrows
     public Mono<byte[]> fetchImageFromOrigin(String imageName) {
-        log.info("Fetch from origin: {}", imageName);
         ValueOperations<String, byte[]> valueOperations = redisTemplate.opsForValue();
         if (redisTemplate.hasKey(imageName)) {
             byte[] bytes = valueOperations.get(imageName);
-            log.info("From redis");
             return Mono.just(bytes);
         }
-
-        log.info("Call origin: {}", originUrl);
 
         var uri = new URI(originUrl + "/" + imageName.trim());
         var result = webClient
@@ -66,15 +62,12 @@ public class OriginFacade {
                 .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG, MediaType.ALL)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
-                            log.info("error: {}", clientResponse);
-                            log.info("code: {}", clientResponse.statusCode());
                             return Mono.error(new ImageNotFoundException("Image not found"));
                         }
                 )
                 .bodyToMono(byte[].class)
                 .doOnSuccess(b -> valueOperations.set(imageName, b));
 
-        log.info("result: {}", result);
         return result;
     }
 
