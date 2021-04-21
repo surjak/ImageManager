@@ -1,19 +1,17 @@
 package com.image.manager.edgeserver.domain.origin;
 
+import com.image.manager.edgeserver.application.config.cache.RocksDBRepository;
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,11 +20,11 @@ public class OriginConfiguration {
 
     @Bean
     public OriginFacade originFacade(OriginProperties originProperties,
-                                     RedisTemplate<String, byte[]> redisTemplate,
+                                     RocksDBRepository rocksDBRepository,
                                      BufferedImageConverter imageConverter) {
 
         return new OriginFacade(
-                redisTemplate,
+                rocksDBRepository,
                 imageConverter,
                 originProperties.getHosts()
                         .stream()

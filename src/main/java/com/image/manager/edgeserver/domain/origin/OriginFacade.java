@@ -1,20 +1,14 @@
 package com.image.manager.edgeserver.domain.origin;
 
+import com.image.manager.edgeserver.application.config.cache.RocksDBRepository;
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
-import com.image.manager.edgeserver.domain.ImageNotFoundException;
 import com.image.manager.edgeserver.domain.operation.Operation;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.awt.image.BufferedImage;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
@@ -31,14 +25,15 @@ public class OriginFacade {
 
     private final Map<String, Origin> origins;
 
-    private final RedisTemplate<String, byte[]> redisTemplate;
     private final BufferedImageConverter imageConverter;
 
-    public OriginFacade(RedisTemplate<String, byte[]> redisTemplate,
-                        BufferedImageConverter imageConverter,
-                        List<Origin> origins) {
+    private final RocksDBRepository rocksDBRepository;
 
-        this.redisTemplate = redisTemplate;
+    public OriginFacade(
+            RocksDBRepository rocksDBRepository,
+            BufferedImageConverter imageConverter,
+            List<Origin> origins) {
+        this.rocksDBRepository = rocksDBRepository;
         this.imageConverter = imageConverter;
         this.origins = origins.stream().collect(Collectors.toMap(Origin::getHost, o -> o));
     }
@@ -52,16 +47,10 @@ public class OriginFacade {
 
     @SneakyThrows
     public Mono<byte[]> fetchImageFromOrigin(String host, String imageName) {
-        ValueOperations<String, byte[]> valueOperations = redisTemplate.opsForValue();
-        if (redisTemplate.hasKey(imageName).booleanValue()) {
-            byte[] bytes = valueOperations.get(imageName);
-            return Mono.just(bytes);
-        }
-
-        return Optional.ofNullable(this.origins.get(host))
+        return rocksDBRepository.find(imageName).map(Mono::just).orElseGet(() -> Optional.ofNullable(this.origins.get(host))
                 .map(origin -> origin.fetchImageFromOrigin(imageName))
-                .map(result -> result.doOnSuccess(b -> valueOperations.set(imageName, b)))
-                .orElse(Mono.error(new UnknownHostException("Origin host not found")));
+                .map(result -> result.doOnSuccess(b -> rocksDBRepository.save(imageName, b)))
+                .orElse(Mono.error(new UnknownHostException("Origin host not found"))));
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img) {
