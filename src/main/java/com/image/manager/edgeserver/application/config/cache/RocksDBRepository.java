@@ -1,5 +1,7 @@
 package com.image.manager.edgeserver.application.config.cache;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
@@ -19,8 +21,13 @@ import java.util.Optional;
 @Repository
 public class RocksDBRepository implements KVRepository<String, byte[]> {
     private final static String FILE_NAME = "spring-boot-db";
+    private final Counter missCounter;
     private File baseDir;
     private RocksDB db;
+
+    public RocksDBRepository(PrometheusMeterRegistry mr) {
+        this.missCounter = Counter.builder("count.cache.miss").register(mr);
+    }
 
     @PostConstruct
     void initialize() {
@@ -50,6 +57,9 @@ public class RocksDBRepository implements KVRepository<String, byte[]> {
     public Optional<byte[]> find(String key) {
         try {
             byte[] bytes = db.get(key.getBytes());
+            if (bytes == null) {
+                missCounter.increment();
+            }
             return Optional.ofNullable(bytes);
         } catch (RocksDBException e) {
             log.error(

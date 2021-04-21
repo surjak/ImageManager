@@ -2,6 +2,7 @@ package com.image.manager.edgeserver.domain.origin;
 
 import com.image.manager.edgeserver.application.config.cache.RocksDBRepository;
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -21,16 +22,18 @@ public class OriginConfiguration {
     @Bean
     public OriginFacade originFacade(OriginProperties originProperties,
                                      RocksDBRepository rocksDBRepository,
-                                     BufferedImageConverter imageConverter) {
+                                     BufferedImageConverter imageConverter,
+                                     PrometheusMeterRegistry mr) {
 
         return new OriginFacade(
                 rocksDBRepository,
                 imageConverter,
-                originProperties.getHosts()
+                originProperties
+                        .getHosts()
                         .stream()
                         .map(host -> new Origin(host, initWebClient(host.getMaxConcurrentConnections())))
-                        .collect(Collectors.toList())
-        );
+                        .collect(Collectors.toList()),
+                mr);
     }
 
     public WebClient initWebClient(int maxNumberOfConnections) {
