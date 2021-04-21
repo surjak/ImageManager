@@ -16,7 +16,6 @@ public class Origin {
     private final String host;
     @Getter
     private final int maxConcurrentConnections;
-
     private final WebClient webClient;
 
     public Origin(OriginProperties.OriginHost host, WebClient webClient) {

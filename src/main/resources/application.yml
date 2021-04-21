@@ -12,6 +12,7 @@ management:
       show-details: 'always'
 
   metrics:
+    export.prometheus.enabled: true
     web:
       server:
         request:
@@ -20,11 +21,3 @@ management:
               - 0.5
               - 0.9
               - 0.99
-
-spring:
-  cache:
-    type: redis
-
-  redis:
-    host: local_redis
-    port: 6379
