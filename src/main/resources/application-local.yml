@@ -1,0 +1,18 @@
+origins:
+  hosts:
+    - url: origin-server.herokuapp.com
+      maxConcurrentConnections: 10
+    - url: origin-server2.herokuapp.com
+      maxConcurrentConnections: 10
+
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    
+#Uncomment to see persistent connections output https://www.javaer101.com/en/article/34147137.html
+#
+#logging:
+#  level:
+#    reactor:
+#      netty: debug

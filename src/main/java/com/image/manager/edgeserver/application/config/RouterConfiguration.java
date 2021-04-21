@@ -30,6 +30,8 @@ public class RouterConfiguration {
     }
 
     /**
+     * curl -v "3.64.252.146:8080/COCO_train2014_000000061203.jpg" --resolve "3.64.252.146:8080:127.0.0.1"
+     * <p>
      * Example usage for now:
      * http://localhost:8080/small-image.png
      * http://localhost:8080/small-image.png?op=crop&w=50&h=50&x=50&y=50
@@ -40,9 +42,17 @@ public class RouterConfiguration {
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
                 .route(GET("/{fileName}"),
-                        serverRequest -> Mono.zip(Mono.justOrEmpty(serverRequest.uri().getQuery()).map(operationParser::fromQuery).switchIfEmpty(Mono.just(java.util.List.of())), Mono.justOrEmpty(serverRequest.pathVariable("fileName")))
-                                .map(a -> originFacade.getImageAndApplyOperations(a.getT2(), a.getT1()))
-                                .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))
+                        serverRequest ->
+                                Mono.zip(
+                                        Mono.justOrEmpty(serverRequest.uri().getQuery())
+                                                .map(operationParser::fromQuery)
+                                                .switchIfEmpty(Mono.just(java.util.List.of())),
+                                        Mono.justOrEmpty(serverRequest.pathVariable("fileName")),
+                                        Mono.justOrEmpty(serverRequest.uri().getHost())
+                                )
+                                        .map(a -> originFacade.getImageAndApplyOperations(a.getT3(), a.getT2(), a.getT1()))
+                                        .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))
+
                 );
     }
 }
