@@ -10,9 +10,11 @@ services:
     ports:
       - "9090:9090"
     volumes:
+      - /path/to/prometheus-data:/prometheus
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.retention.time=14d"
-      - "--storage.tsdb.retention.size=1GB"
+      - "--storage.tsdb.retention.size=512MB"
+      - "--storage.tsdb.path=/prometheus"
     container_name: prometheus
