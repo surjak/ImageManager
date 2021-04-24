@@ -27,6 +27,11 @@ public class ScaleOperation extends Operation {
     }
 
     @Override
+    public int getOrder() {
+        return 1;
+    }
+
+    @Override
     protected void fixMissingProperties(BufferedImage image) {
         if (this.w == null && this.h == null) {
             this.w = image.getWidth();
@@ -60,9 +65,9 @@ public class ScaleOperation extends Operation {
         }
 
         @Override
-        public Operation fromArguments(Map<String, Integer> arguments) {
-            Integer w = arguments.get(W);
-            Integer h = arguments.get(H);
+        public Operation fromArguments(Map<String, String> arguments) {
+            Integer w = Integer.parseInt(arguments.get(W));
+            Integer h = Integer.parseInt(arguments.get(H));
 
             return new ScaleOperation(w, h);
         }

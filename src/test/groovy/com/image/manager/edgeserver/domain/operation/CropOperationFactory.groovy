@@ -16,27 +16,22 @@ class CropOperationFactory {
     @Test
     void 'Should create operation from valid arguments'() {
         // given:
-        def expectedX = 25
-        def expectedY = 35
-
-        def expectedWidth = 10
-        def expectedHeight = 20
 
         def arguments = [
-                x: expectedX,
-                y: expectedY,
-                w: expectedWidth,
-                h: expectedHeight
+                x: "25",
+                y: "35",
+                w: "10",
+                h: "20"
         ]
 
         // when:
         CropOperation actualOperation = cropOperationFactory.fromArguments(arguments) as CropOperation
 
         // then:
-        assert ReflectionTestUtils.getField(actualOperation, 'x') == expectedX
-        assert ReflectionTestUtils.getField(actualOperation, 'y') == expectedY
-        assert ReflectionTestUtils.getField(actualOperation, 'w') == expectedWidth
-        assert ReflectionTestUtils.getField(actualOperation, 'h') == expectedHeight
+        assert ReflectionTestUtils.getField(actualOperation, 'x') == 25
+        assert ReflectionTestUtils.getField(actualOperation, 'y') == 35
+        assert ReflectionTestUtils.getField(actualOperation, 'w') == 10
+        assert ReflectionTestUtils.getField(actualOperation, 'h') == 20
 
     }
 

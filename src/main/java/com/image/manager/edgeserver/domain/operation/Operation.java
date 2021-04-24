@@ -10,6 +10,8 @@ public abstract class Operation {
 
     protected abstract BufferedImage processImage(BufferedImage image);
 
+    public abstract int getOrder();
+
     public final BufferedImage execute(BufferedImage image) {
         fixMissingProperties(image);
         validateProperties(image);
@@ -26,10 +28,8 @@ public abstract class Operation {
     }
 
     interface Factory {
-
         OperationType getSupportedType();
-        Operation fromArguments(Map<String, Integer> arguments);
-
+        Operation fromArguments(Map<String, String> arguments);
     }
 
 }

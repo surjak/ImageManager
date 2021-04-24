@@ -12,17 +12,19 @@ class OperationFactoryTest {
 
     private OperationFactory operationFactory
 
-    private Operation.Factory scaleOperationFactory, cropOperationFactory
+    private Operation.Factory scaleOperationFactory, cropOperationFactory, watermarkOperationFactory
 
     @BeforeEach
     void setUp() {
         this.scaleOperationFactory = mock Operation.Factory
         this.cropOperationFactory = mock Operation.Factory
+        this.watermarkOperationFactory = mock Operation.Factory
 
         when(scaleOperationFactory.getSupportedType()).thenReturn(OperationType.SCALE)
         when(cropOperationFactory.getSupportedType()).thenReturn(OperationType.CROP)
+        when(watermarkOperationFactory.getSupportedType()).thenReturn(OperationType.WATERMARK)
 
-        this.operationFactory = new OperationFactory([scaleOperationFactory, cropOperationFactory])
+        this.operationFactory = new OperationFactory([scaleOperationFactory, cropOperationFactory, watermarkOperationFactory])
     }
 
     @Test

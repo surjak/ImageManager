@@ -31,6 +31,11 @@ public class CropOperation extends Operation {
     }
 
     @Override
+    public int getOrder() {
+        return 1;
+    }
+
+    @Override
     protected void fixMissingProperties(BufferedImage image) {
         this.x = this.x != null ? this.x : DEFAULT_X;
         this.y = this.y != null ? this.y : DEFAULT_Y;
@@ -78,11 +83,11 @@ public class CropOperation extends Operation {
         }
 
         @Override
-        public Operation fromArguments(Map<String, Integer> arguments) {
-            Integer x = arguments.get(X);
-            Integer y = arguments.get(Y);
-            Integer w = arguments.get(W);
-            Integer h = arguments.get(H);
+        public Operation fromArguments(Map<String, String> arguments) {
+            Integer x = Integer.parseInt(arguments.get(X));
+            Integer y = Integer.parseInt(arguments.get(Y));
+            Integer w = Integer.parseInt(arguments.get(W));
+            Integer h = Integer.parseInt(arguments.get(H));
 
             return new CropOperation(x, y, w, h);
         }

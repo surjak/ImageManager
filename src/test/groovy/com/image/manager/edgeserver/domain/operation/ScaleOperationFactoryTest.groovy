@@ -16,20 +16,18 @@ class ScaleOperationFactoryTest {
     @Test
     void 'Should create operation from valid arguments'() {
         // given:
-        def expectedWidth = 10
-        def expectedHeight = 20
 
         def arguments = [
-            w: expectedWidth,
-            h: expectedHeight
+            w: "10",
+            h: "20"
         ]
 
         // when:
         ScaleOperation actualOperation = scaleOperationFactory.fromArguments(arguments) as ScaleOperation
 
         // then:
-        assert ReflectionTestUtils.getField(actualOperation, 'w') == expectedWidth
-        assert ReflectionTestUtils.getField(actualOperation, 'h') == expectedHeight
+        assert ReflectionTestUtils.getField(actualOperation, 'w') == 10
+        assert ReflectionTestUtils.getField(actualOperation, 'h') == 20
     }
 
 }

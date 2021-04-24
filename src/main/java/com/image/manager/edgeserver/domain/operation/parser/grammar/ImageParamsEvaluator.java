@@ -8,12 +8,28 @@ class ImageParamsEvaluator extends ImageParamsBaseListener {
 
     @Getter
     private ImageParams imageParams;
+    private FormatOption currentFormatOption;
     private ImageOperation currentOperation;
     private ImageOperationArgument currentOperationArgument;
 
     @Override
     public void enterParams(ImageParamsParser.ParamsContext ctx) {
         this.imageParams = new ImageParams();
+    }
+
+    @Override
+    public void enterFormatOption(ImageParamsParser.FormatOptionContext ctx) {
+        this.currentFormatOption = new FormatOption();
+    }
+
+    @Override
+    public void enterFormatOptionName(ImageParamsParser.FormatOptionNameContext ctx) {
+        this.currentFormatOption.setType(OperationType.getByName(ctx.getText()));
+    }
+
+    @Override
+    public void enterFormatOptionValue(ImageParamsParser.FormatOptionValueContext ctx) {
+        this.currentFormatOption.setOptionValue(ctx.getText());
     }
 
     @Override
@@ -38,7 +54,12 @@ class ImageParamsEvaluator extends ImageParamsBaseListener {
 
     @Override
     public void enterOperationArgumentValue(ImageParamsParser.OperationArgumentValueContext ctx) {
-        this.currentOperationArgument.setValue(Integer.parseInt(ctx.getText()));
+        this.currentOperationArgument.setValue(ctx.getText());
+    }
+
+    @Override
+    public void exitFormatOption(ImageParamsParser.FormatOptionContext ctx) {
+        this.imageParams.getFormatOptions().add(this.currentFormatOption);
     }
 
     @Override
