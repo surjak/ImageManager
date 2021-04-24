@@ -32,4 +32,12 @@ public abstract class Operation {
         Operation fromArguments(Map<String, String> arguments);
     }
 
+    protected static Integer parseNumber(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
 }

@@ -66,8 +66,8 @@ public class ScaleOperation extends Operation {
 
         @Override
         public Operation fromArguments(Map<String, String> arguments) {
-            Integer w = Integer.parseInt(arguments.get(W));
-            Integer h = Integer.parseInt(arguments.get(H));
+            Integer w = parseNumber(arguments.get(W));
+            Integer h = parseNumber(arguments.get(H));
 
             return new ScaleOperation(w, h);
         }

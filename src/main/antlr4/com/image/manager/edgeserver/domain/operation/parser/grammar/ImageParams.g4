@@ -23,4 +23,4 @@ operationName: TEXT;
 operationArgument: operationArgumentName '=' operationArgumentValue;
 
 operationArgumentName: TEXT;
-operationArgumentValue: TEXT;
+operationArgumentValue: NUMBER;

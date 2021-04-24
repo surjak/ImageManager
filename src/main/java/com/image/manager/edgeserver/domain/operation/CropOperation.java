@@ -84,10 +84,10 @@ public class CropOperation extends Operation {
 
         @Override
         public Operation fromArguments(Map<String, String> arguments) {
-            Integer x = Integer.parseInt(arguments.get(X));
-            Integer y = Integer.parseInt(arguments.get(Y));
-            Integer w = Integer.parseInt(arguments.get(W));
-            Integer h = Integer.parseInt(arguments.get(H));
+            Integer x = parseNumber(arguments.get(X));
+            Integer y = parseNumber(arguments.get(Y));
+            Integer w = parseNumber(arguments.get(W));
+            Integer h = parseNumber(arguments.get(H));
 
             return new CropOperation(x, y, w, h);
         }
