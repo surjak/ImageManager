@@ -1,5 +1,6 @@
 package com.image.manager.edgeserver.domain.operation.parser.grammar
 
+import com.image.manager.edgeserver.domain.operation.CompressionOperation
 import com.image.manager.edgeserver.domain.operation.CropOperation
 import com.image.manager.edgeserver.domain.operation.OperationFactory
 import com.image.manager.edgeserver.domain.operation.ScaleOperation
@@ -14,7 +15,7 @@ class GrammarOperationParserTest {
 
     @BeforeEach
     void setUp() {
-        def operationFactory = new OperationFactory([new CropOperation.Factory(), new ScaleOperation.Factory(), new WatermarkOperation.Factory()])
+        def operationFactory = new OperationFactory([new CropOperation.Factory(), new ScaleOperation.Factory(), new WatermarkOperation.Factory(), new CompressionOperation.Factory()])
         this.parser = new GrammarOperationParser(operationFactory)
     }
 

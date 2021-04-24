@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.util.Map;
 
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class ScaleOperation extends Operation {
 
     private Integer w;
@@ -21,7 +21,7 @@ public class ScaleOperation extends Operation {
     }
 
     @Override
-    protected BufferedImage processImage(BufferedImage image) {
+    protected BufferedImage processImage(BufferedImage image, String imageFormat) {
         fixMissingProperties(image);
         return Scalr.resize(image, Scalr.Mode.FIT_EXACT, w, h);
     }

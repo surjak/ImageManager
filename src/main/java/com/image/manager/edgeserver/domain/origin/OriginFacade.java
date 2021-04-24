@@ -63,7 +63,7 @@ public class OriginFacade {
                     originOutboundTraffic.record(imgBytes.length);
                     return imageConverter.byteArrayToBufferedImage(imgBytes);
                 })
-                .flatMap(img -> applyOperationsOnImage(operations, img)).map(imageConverter::bufferedImageToByteArray);
+                .flatMap(img -> applyOperationsOnImage(operations, img, fileName)).map(imageConverter::bufferedImageToByteArray);
     }
 
     @SneakyThrows
@@ -77,8 +77,8 @@ public class OriginFacade {
                 .orElse(Mono.error(new UnknownHostException("Origin host not found"))));
     }
 
-    private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img) {
+    private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img, String fileName) {
         return Flux.fromIterable(operations)
-                .reduce(img, (i, operation) -> operation.execute(i));
+                .reduce(img, (i, operation) -> operation.execute(i, fileName));
     }
 }

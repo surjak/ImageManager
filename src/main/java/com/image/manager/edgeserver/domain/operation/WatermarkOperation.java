@@ -1,12 +1,14 @@
 package com.image.manager.edgeserver.domain.operation;
 
 import com.image.manager.edgeserver.domain.operation.parser.grammar.FormatOption;
+import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+@EqualsAndHashCode(callSuper = true)
 public class WatermarkOperation extends Operation {
 
 
@@ -14,7 +16,7 @@ public class WatermarkOperation extends Operation {
     public static final Font FONT = new Font("Arial", Font.BOLD, 11);
 
     @Override
-    protected BufferedImage processImage(BufferedImage image) {
+    protected BufferedImage processImage(BufferedImage image, String imageFormat) {
         Graphics graphics = image.getGraphics();
         graphics.setFont(FONT);
         graphics.drawString(AGH_COPYRIGHT_2021, 0, image.getHeight() - 10);

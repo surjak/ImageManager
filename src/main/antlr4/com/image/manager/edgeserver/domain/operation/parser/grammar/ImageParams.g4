@@ -14,7 +14,7 @@ params: (formatOptions '&' operations) | formatOptions | operations;
 formatOptions: formatOption ('&' formatOption)*;
 formatOption: formatOptionName '=' formatOptionValue;
 formatOptionName: TEXT;
-formatOptionValue: TEXT;
+formatOptionValue: TEXT | NUMBER;
 
 operations: operation ('&' operation)*;
 operation: 'op=' operationName ('&' operationArgument)*;

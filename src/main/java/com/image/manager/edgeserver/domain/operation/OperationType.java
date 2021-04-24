@@ -11,7 +11,8 @@ public enum OperationType {
 
     SCALE("scale"),
     CROP("crop"),
-    WATERMARK("w");
+    WATERMARK("w"),
+    COMPRESSION("c");
 
     private final String alias;
 

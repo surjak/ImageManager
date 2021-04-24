@@ -26,7 +26,7 @@ public class CropOperation extends Operation {
     }
 
     @Override
-    protected BufferedImage processImage(BufferedImage image) {
+    protected BufferedImage processImage(BufferedImage image, String imageFormat) {
         return image.getSubimage(x, y, w, h);
     }
 
