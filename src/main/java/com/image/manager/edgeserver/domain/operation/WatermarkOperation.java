@@ -11,12 +11,13 @@ public class WatermarkOperation extends Operation {
 
 
     public static final String AGH_COPYRIGHT_2021 = "AGH Copyright @2021";
+    public static final Font FONT = new Font("Arial", Font.BOLD, 11);
 
     @Override
     protected BufferedImage processImage(BufferedImage image) {
         Graphics graphics = image.getGraphics();
-        graphics.setFont(new Font("Arial", Font.BOLD, 20));
-        graphics.drawString(AGH_COPYRIGHT_2021, image.getWidth() / 2, image.getHeight() / 2);
+        graphics.setFont(FONT);
+        graphics.drawString(AGH_COPYRIGHT_2021, 0, image.getHeight() - 10);
         graphics.dispose();
         return image;
     }
@@ -36,7 +37,7 @@ public class WatermarkOperation extends Operation {
 
         @Override
         public Operation fromArguments(Map<String, String> arguments) {
-            return arguments.containsKey(FormatOption.VALUE) ? new WatermarkOperation() : null;
+            return arguments.get(FormatOption.VALUE).equals("true") ? new WatermarkOperation() : null;
         }
 
     }
