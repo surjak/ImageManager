@@ -5,7 +5,8 @@ import java.util.stream.Stream;
 public enum OperationType {
 
     SCALE,
-    CROP;
+    CROP,
+    WATERMARK;
 
     public static OperationType getByName(String name) {
         return Stream.of(values())
