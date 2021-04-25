@@ -17,7 +17,7 @@ class SplitOperationParserTest {
 
     @BeforeEach
     void setUp() {
-        var operationFactory = new OperationFactory(List.of(new CropOperation.Factory(), new ScaleOperation.Factory(), new WatermarkOperation.Factory(), new CompressionOperation.Factory()));
+        var operationFactory = new OperationFactory(List.of(new CropOperation.Factory(), new ScaleOperation.Factory(), new WatermarkOperation.Factory(), new CompressionOperation.Factory(), new QualityOperation.Factory()));
         this.operationParser = new SplitOperationParser(operationFactory);
     }
 

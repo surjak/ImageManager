@@ -13,7 +13,7 @@ class OperationFactoryTest {
 
     private OperationFactory operationFactory
 
-    private Operation.Factory scaleOperationFactory, cropOperationFactory, watermarkOperationFactory, conversionOperationFactory
+    private Operation.Factory scaleOperationFactory, cropOperationFactory, watermarkOperationFactory, conversionOperationFactory, qualityOperationFactory
 
     @BeforeEach
     void setUp() {
@@ -21,13 +21,15 @@ class OperationFactoryTest {
         this.cropOperationFactory = mock Operation.Factory
         this.watermarkOperationFactory = mock Operation.Factory
         this.conversionOperationFactory = mock Operation.Factory
+        this.qualityOperationFactory = mock Operation.Factory
 
         when(scaleOperationFactory.getSupportedType()).thenReturn(OperationType.SCALE)
         when(cropOperationFactory.getSupportedType()).thenReturn(OperationType.CROP)
         when(watermarkOperationFactory.getSupportedType()).thenReturn(OperationType.WATERMARK)
         when(conversionOperationFactory.getSupportedType()).thenReturn(OperationType.COMPRESSION)
+        when(qualityOperationFactory.getSupportedType()).thenReturn(OperationType.QUALITY)
 
-        this.operationFactory = new OperationFactory([scaleOperationFactory, cropOperationFactory, watermarkOperationFactory, conversionOperationFactory])
+        this.operationFactory = new OperationFactory([scaleOperationFactory, cropOperationFactory, watermarkOperationFactory, conversionOperationFactory, qualityOperationFactory])
     }
 
     @Test

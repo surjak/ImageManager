@@ -17,7 +17,7 @@ public abstract class Operation {
         validateProperties(image);
         var strings =  fileName.split("\\.");
 
-        return processImage(image, strings[strings.length -1]);
+        return processImage(image, strings[strings.length - 1]);
     }
 
     protected void fixMissingProperties(BufferedImage image) {
