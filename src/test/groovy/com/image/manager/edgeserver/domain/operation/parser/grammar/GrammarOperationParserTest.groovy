@@ -1,8 +1,11 @@
 package com.image.manager.edgeserver.domain.operation.parser.grammar
 
+import com.image.manager.edgeserver.domain.operation.CompressionOperation
 import com.image.manager.edgeserver.domain.operation.CropOperation
 import com.image.manager.edgeserver.domain.operation.OperationFactory
+import com.image.manager.edgeserver.domain.operation.QualityOperation
 import com.image.manager.edgeserver.domain.operation.ScaleOperation
+import com.image.manager.edgeserver.domain.operation.WatermarkOperation
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.test.util.ReflectionTestUtils
@@ -13,7 +16,7 @@ class GrammarOperationParserTest {
 
     @BeforeEach
     void setUp() {
-        def operationFactory = new OperationFactory([new CropOperation.Factory(), new ScaleOperation.Factory()])
+        def operationFactory = new OperationFactory([new CropOperation.Factory(), new ScaleOperation.Factory(), new WatermarkOperation.Factory(), new CompressionOperation.Factory(), new QualityOperation.Factory()])
         this.parser = new GrammarOperationParser(operationFactory)
     }
 

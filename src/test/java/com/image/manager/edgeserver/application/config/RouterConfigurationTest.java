@@ -11,9 +11,11 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.server.ServerRequest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
@@ -41,7 +43,7 @@ class RouterConfigurationTest {
                 .expectBody(byte[].class);
         //then
         ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
-        verify(originFacade).getImageAndApplyOperations("", fileNameCaptor.capture(), any());
+        verify(originFacade).getImageAndApplyOperations(mock(ServerRequest.class), fileNameCaptor.capture(), any());
         assertThat(fileNameCaptor.getValue()).isEqualTo(fileName);
     }
 }

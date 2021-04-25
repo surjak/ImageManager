@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 class ImageParams {
 
+    private List<FormatOption> formatOptions = new ArrayList<>();
     private List<ImageOperation> operations = new ArrayList<>();
 
 }
