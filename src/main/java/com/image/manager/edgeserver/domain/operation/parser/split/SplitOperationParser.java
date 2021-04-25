@@ -27,7 +27,7 @@ public class SplitOperationParser implements OperationParser {
     private Operation fromSubQuery(String query) {
         String[] params = query.split("&");
         //optimizer here
-        Map<String, Integer> arguments = new HashMap();
+        Map<String, String> arguments = new HashMap();
         OperationType operationType = OperationType.valueOf(params[0].toUpperCase());
         for (int i = 1; i < params.length; i++) {
 
@@ -38,7 +38,7 @@ public class SplitOperationParser implements OperationParser {
                 //skip the repeating properties for now, leave it for optimizer
                 continue;
             }
-            arguments.put(key, Integer.valueOf(value));
+            arguments.put(key, value);
         }
         
         return operationFactory.createOperation(operationType, arguments);

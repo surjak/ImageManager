@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 import static org.mockito.ArgumentMatchers.anyMap
+import static org.mockito.ArgumentMatchers.contains
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,17 +13,23 @@ class OperationFactoryTest {
 
     private OperationFactory operationFactory
 
-    private Operation.Factory scaleOperationFactory, cropOperationFactory
+    private Operation.Factory scaleOperationFactory, cropOperationFactory, watermarkOperationFactory, conversionOperationFactory, qualityOperationFactory
 
     @BeforeEach
     void setUp() {
         this.scaleOperationFactory = mock Operation.Factory
         this.cropOperationFactory = mock Operation.Factory
+        this.watermarkOperationFactory = mock Operation.Factory
+        this.conversionOperationFactory = mock Operation.Factory
+        this.qualityOperationFactory = mock Operation.Factory
 
         when(scaleOperationFactory.getSupportedType()).thenReturn(OperationType.SCALE)
         when(cropOperationFactory.getSupportedType()).thenReturn(OperationType.CROP)
+        when(watermarkOperationFactory.getSupportedType()).thenReturn(OperationType.WATERMARK)
+        when(conversionOperationFactory.getSupportedType()).thenReturn(OperationType.COMPRESSION)
+        when(qualityOperationFactory.getSupportedType()).thenReturn(OperationType.QUALITY)
 
-        this.operationFactory = new OperationFactory([scaleOperationFactory, cropOperationFactory])
+        this.operationFactory = new OperationFactory([scaleOperationFactory, cropOperationFactory, watermarkOperationFactory, conversionOperationFactory, qualityOperationFactory])
     }
 
     @Test

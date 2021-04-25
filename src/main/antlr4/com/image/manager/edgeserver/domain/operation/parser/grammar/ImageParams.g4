@@ -8,7 +8,15 @@ NUMBER: NEGATIVE_SIGN? DIGIT+;
 TEXT   : LETTER+ ;
 CRLF : '\r'? '\n' | '\r';
 
-params: operation ('&' operation)*;
+
+params: (formatOptions '&' operations) | formatOptions | operations;
+
+formatOptions: formatOption ('&' formatOption)*;
+formatOption: formatOptionName '=' formatOptionValue;
+formatOptionName: TEXT;
+formatOptionValue: TEXT | NUMBER;
+
+operations: operation ('&' operation)*;
 operation: 'op=' operationName ('&' operationArgument)*;
 
 operationName: TEXT;

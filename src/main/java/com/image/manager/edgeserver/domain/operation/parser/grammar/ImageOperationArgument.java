@@ -6,6 +6,6 @@ import lombok.Data;
 class ImageOperationArgument {
 
     private String name;
-    private int value;
+    private String value;
 
 }

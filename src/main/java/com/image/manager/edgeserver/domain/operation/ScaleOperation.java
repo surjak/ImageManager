@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.util.Map;
 
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class ScaleOperation extends Operation {
 
     private Integer w;
@@ -21,9 +21,14 @@ public class ScaleOperation extends Operation {
     }
 
     @Override
-    protected BufferedImage processImage(BufferedImage image) {
+    protected BufferedImage processImage(BufferedImage image, String imageFormat) {
         fixMissingProperties(image);
         return Scalr.resize(image, Scalr.Mode.FIT_EXACT, w, h);
+    }
+
+    @Override
+    public int getOrder() {
+        return 1;
     }
 
     @Override
@@ -60,9 +65,9 @@ public class ScaleOperation extends Operation {
         }
 
         @Override
-        public Operation fromArguments(Map<String, Integer> arguments) {
-            Integer w = arguments.get(W);
-            Integer h = arguments.get(H);
+        public Operation fromArguments(Map<String, String> arguments) {
+            Integer w = parseNumber(arguments.get(W));
+            Integer h = parseNumber(arguments.get(H));
 
             return new ScaleOperation(w, h);
         }

@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -49,13 +50,20 @@ public class OriginFacade {
                 .register(mr);
     }
 
-    public Mono<byte[]> getImageAndApplyOperations(String host, String fileName, List<Operation> operations) {
+    public Mono<byte[]> getImageAndApplyOperations(ServerRequest request, String fileName, List<Operation> operations) {
+        var host = request
+                .headers()
+                .header("Host")
+                .stream()
+                .findFirst()
+                .orElse(request.uri().getHost());
+
         return fetchImageFromOrigin(host, fileName)
                 .map(imgBytes -> {
                     originOutboundTraffic.record(imgBytes.length);
                     return imageConverter.byteArrayToBufferedImage(imgBytes);
                 })
-                .flatMap(img -> applyOperationsOnImage(operations, img)).map(imageConverter::bufferedImageToByteArray);
+                .flatMap(img -> applyOperationsOnImage(operations, img, fileName)).map(imageConverter::bufferedImageToByteArray);
     }
 
     @SneakyThrows
@@ -69,8 +77,8 @@ public class OriginFacade {
                 .orElse(Mono.error(new UnknownHostException("Origin host not found"))));
     }
 
-    private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img) {
+    private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img, String fileName) {
         return Flux.fromIterable(operations)
-                .reduce(img, (i, operation) -> operation.execute(i));
+                .reduce(img, (i, operation) -> operation.execute(i, fileName));
     }
 }

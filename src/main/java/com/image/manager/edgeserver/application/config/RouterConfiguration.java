@@ -31,7 +31,7 @@ public class RouterConfiguration {
 
     /**
      * curl -v "3.64.252.146:8080/COCO_train2014_000000061203.jpg" --resolve "3.64.252.146:8080:127.0.0.1"
-     * LOCAL: curl -v "origin-server.herokuapp.com:8080/COCO_train2014_000000000094.jpg" --resolve "origin-server.herokuapp.com:8080:127.0.0.1"
+     * LOCAL: curl -v "origin-server.herokuapp.com:8080/COCO_train2014_000000000094.jpg?w=true&op=scale&w=100" --resolve "origin-server.herokuapp.com:8080:127.0.0.1"
      * PROD: curl -v "10.0.0.102:8080/COCO_train2014_000000061203.jpg" --resolve "10.0.0.102:8080:18.195.96.105"
      * <p>
      * Example usage for now:
@@ -50,7 +50,7 @@ public class RouterConfiguration {
                                                 .map(operationParser::fromQuery)
                                                 .switchIfEmpty(Mono.just(java.util.List.of())),
                                         Mono.justOrEmpty(serverRequest.pathVariable("fileName")),
-                                        Mono.justOrEmpty(serverRequest.uri().getHost())
+                                        Mono.justOrEmpty(serverRequest)
                                 )
                                         .map(a -> originFacade.getImageAndApplyOperations(a.getT3(), a.getT2(), a.getT1()))
                                         .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))

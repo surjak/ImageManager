@@ -26,8 +26,13 @@ public class CropOperation extends Operation {
     }
 
     @Override
-    protected BufferedImage processImage(BufferedImage image) {
+    protected BufferedImage processImage(BufferedImage image, String imageFormat) {
         return image.getSubimage(x, y, w, h);
+    }
+
+    @Override
+    public int getOrder() {
+        return 1;
     }
 
     @Override
@@ -78,11 +83,11 @@ public class CropOperation extends Operation {
         }
 
         @Override
-        public Operation fromArguments(Map<String, Integer> arguments) {
-            Integer x = arguments.get(X);
-            Integer y = arguments.get(Y);
-            Integer w = arguments.get(W);
-            Integer h = arguments.get(H);
+        public Operation fromArguments(Map<String, String> arguments) {
+            Integer x = parseNumber(arguments.get(X));
+            Integer y = parseNumber(arguments.get(Y));
+            Integer w = parseNumber(arguments.get(W));
+            Integer h = parseNumber(arguments.get(H));
 
             return new CropOperation(x, y, w, h);
         }

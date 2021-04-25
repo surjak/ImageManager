@@ -9,14 +9,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
-class ImageOperation implements Operationable {
+public class FormatOption implements Operationable {
 
+    public static final String VALUE = "valueKey";
     private OperationType type;
-    private List<ImageOperationArgument> arguments = new ArrayList<>();
+    private String optionValue;
 
     public Map<String, String> getArgumentsMap() {
-        return this.arguments.stream()
-                .collect(Collectors.toMap(ImageOperationArgument::getName, ImageOperationArgument::getValue));
+        return Map.of(VALUE, optionValue);
     }
-
 }

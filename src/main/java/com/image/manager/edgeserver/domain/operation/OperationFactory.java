@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 @Service
 public class OperationFactory {
 
-    private final Map<OperationType, Function<Map<String, Integer>, Operation>> operationsMap;
+    private final Map<OperationType, Function<Map<String, String>, Operation>> operationsMap;
 
     public OperationFactory(List<Operation.Factory> factories) {
         operationsMap = factories.stream()
@@ -20,7 +20,7 @@ public class OperationFactory {
         verifyCoverage();
     }
 
-    public Operation createOperation(OperationType type, Map<String, Integer> arguments) {
+    public Operation createOperation(OperationType type, Map<String, String> arguments) {
         return operationsMap.get(type).apply(arguments);
     }
 
