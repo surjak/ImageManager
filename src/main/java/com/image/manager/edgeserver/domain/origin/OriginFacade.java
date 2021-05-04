@@ -1,44 +1,55 @@
 package com.image.manager.edgeserver.domain.origin;
 
-import com.image.manager.edgeserver.application.config.cache.RocksDBRepository;
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
 import com.image.manager.edgeserver.domain.operation.Operation;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.cache.CacheMono;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Signal;
 
 import java.awt.image.BufferedImage;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 
 /**
  * Created by surjak on 22.03.2021
  */
-
 @Slf4j
 public class OriginFacade {
 
     private final Map<String, Origin> origins;
     private final BufferedImageConverter imageConverter;
-    private final RocksDBRepository rocksDBRepository;
     private final DistributionSummary originInboundTraffic;
     private final DistributionSummary originOutboundTraffic;
+    private final CacheManager cacheManager;
+    private static final String CACHE_NAME = "edgeCache";
+    private final BiFunction<String, Signal<? extends Origin.ResponseFromOrigin>, Mono<Void>> writer;
+    private final Function<String, Mono<Signal<? extends Origin.ResponseFromOrigin>>> reader;
 
     public OriginFacade(
-            RocksDBRepository rocksDBRepository,
+            CacheManager cacheManager,
             BufferedImageConverter imageConverter,
             List<Origin> origins,
             PrometheusMeterRegistry mr) {
-        this.rocksDBRepository = rocksDBRepository;
         this.imageConverter = imageConverter;
+        this.cacheManager = cacheManager;
         this.origins = origins.stream().collect(Collectors.toMap(Origin::getHost, o -> o));
         this.originInboundTraffic = DistributionSummary
                 .builder("origin.inbound.traffic.size")
@@ -48,33 +59,56 @@ public class OriginFacade {
                 .builder("edge.outbound.traffic.size")
                 .baseUnit("bytes")
                 .register(mr);
+        this.writer = (k, val) -> Mono.just(val)
+                .dematerialize()
+                .doOnNext(l -> {
+                    cacheManager.getCache(CACHE_NAME)
+                            .put(k, l);
+                    System.out.println("writing");
+                })
+                .then();
+
+        this.reader = k -> Mono.justOrEmpty(
+                Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)))
+                .flatMap(v -> Mono.justOrEmpty(v).materialize());
+
     }
 
-    public Mono<byte[]> getImageAndApplyOperations(ServerRequest request, String fileName, List<Operation> operations) {
+    public Mono<ServerResponse> getImageAndApplyOperations(ServerRequest request, String fileName, List<Operation> operations) {
         var host = request
                 .headers()
                 .header("Host")
                 .stream()
                 .findFirst()
                 .orElse(request.uri().getHost());
+        AtomicReference<String> i = new AtomicReference<>();
 
         return fetchImageFromOrigin(host, fileName)
                 .map(imgBytes -> {
-                    originOutboundTraffic.record(imgBytes.length);
-                    return imageConverter.byteArrayToBufferedImage(imgBytes);
+                    i.set(imgBytes.getETag());
+                    originOutboundTraffic.record(imgBytes.getImage().length);
+                    return imageConverter.byteArrayToBufferedImage(imgBytes.getImage());
                 })
-                .flatMap(img -> applyOperationsOnImage(operations, img, fileName)).map(imageConverter::bufferedImageToByteArray);
+                .flatMap(img -> applyOperationsOnImage(operations, img, fileName))
+                .map(imageConverter::bufferedImageToByteArray)
+                .map(a -> new Origin.ResponseFromOrigin(a, i.get()))
+                .flatMap(p -> ok().eTag(p.getETag()).contentType(MediaType.IMAGE_PNG).body(Mono.justOrEmpty(p.getImage()), byte[].class));
     }
 
     @SneakyThrows
-    public Mono<byte[]> fetchImageFromOrigin(String host, String imageName) {
-        return rocksDBRepository.find(imageName).map(Mono::just).orElseGet(() -> Optional.ofNullable(this.origins.get(host))
-                .map(origin -> origin.fetchImageFromOrigin(imageName))
-                .map(result -> result.doOnSuccess(imgBytes -> {
-                    originInboundTraffic.record(imgBytes.length);
-                    rocksDBRepository.save(imageName, imgBytes);
-                }))
-                .orElse(Mono.error(new UnknownHostException("Origin host not found"))));
+    public Mono<Origin.ResponseFromOrigin> fetchImageFromOrigin(String host, String imageName) {
+        return CacheMono.lookup(reader, imageName)
+                .onCacheMissResume(() ->
+                        Optional.ofNullable(this.origins.get(host))
+                                .map(origin -> origin.fetchImageFromOrigin(imageName))
+                                .map(result -> result.doOnSuccess(imgBytes -> {
+                                            originInboundTraffic.record(imgBytes.getImage().length);
+                                            System.out.println("From origin");
+                                        }
+                                ))
+                                .orElse(Mono.error(new UnknownHostException("Origin host not found")))
+
+                ).andWriteWith(writer);
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img, String fileName) {

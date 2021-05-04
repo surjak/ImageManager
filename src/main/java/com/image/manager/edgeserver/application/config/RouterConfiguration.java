@@ -1,6 +1,7 @@
 package com.image.manager.edgeserver.application.config;
 
 import com.image.manager.edgeserver.domain.operation.parser.OperationParser;
+import com.image.manager.edgeserver.domain.origin.Origin;
 import com.image.manager.edgeserver.domain.origin.OriginFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +54,7 @@ public class RouterConfiguration {
                                         Mono.justOrEmpty(serverRequest)
                                 )
                                         .map(a -> originFacade.getImageAndApplyOperations(a.getT3(), a.getT2(), a.getT1()))
-                                        .flatMap(p -> ok().contentType(MediaType.IMAGE_PNG).body(p, byte[].class))
+                                        .flatMap(p -> p)
 
                 );
     }
