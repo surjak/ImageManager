@@ -7,6 +7,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Signal;
 
 import java.awt.image.BufferedImage;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -81,18 +83,18 @@ public class OriginFacade {
                 .stream()
                 .findFirst()
                 .orElse(request.uri().getHost());
-        AtomicReference<String> i = new AtomicReference<>();
+        AtomicReference<Origin.ResponseFromOrigin> i = new AtomicReference<>();
 
         return fetchImageFromOrigin(host, fileName)
                 .map(imgBytes -> {
-                    i.set(imgBytes.getETag());
+                    i.set(imgBytes);
                     originOutboundTraffic.record(imgBytes.getImage().length);
                     return imageConverter.byteArrayToBufferedImage(imgBytes.getImage());
                 })
                 .flatMap(img -> applyOperationsOnImage(operations, img, fileName))
                 .map(imageConverter::bufferedImageToByteArray)
-                .map(a -> new Origin.ResponseFromOrigin(a, i.get()))
-                .flatMap(p -> ok().eTag(p.getETag()).contentType(MediaType.IMAGE_PNG).body(Mono.justOrEmpty(p.getImage()), byte[].class));
+                .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
+                .flatMap(p -> ok().eTag(p.getETag()).cacheControl(CacheControl.maxAge(Duration.ofHours(1))).contentType(MediaType.IMAGE_PNG).body(Mono.justOrEmpty(p.getImage()), byte[].class));
     }
 
     @SneakyThrows

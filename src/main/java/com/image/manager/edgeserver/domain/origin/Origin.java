@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.stream.Collectors;
@@ -35,20 +36,16 @@ public class Origin {
                 .uri(new URI(host + "/" + imageName.trim()))
                 .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG)
                 .exchangeToMono(clientResponse -> {
-                    if(clientResponse.statusCode().is4xxClientError()){
+                    if (clientResponse.statusCode().is4xxClientError()) {
                         return Mono.error(new ImageNotFoundException("Image not found"));
-                    }else if(clientResponse.statusCode().is2xxSuccessful()){
-                        String etag = clientResponse.headers().header("Etag").get(0);
-                        System.out.println(etag);
-                        return clientResponse.bodyToMono(byte[].class).map(im ->new ResponseFromOrigin(im, etag));
-                    }else return Mono.empty();
+                    } else if (clientResponse.statusCode().is2xxSuccessful()) {
+                        String etag = clientResponse.headers().asHttpHeaders().getETag();
+                        return clientResponse.bodyToMono(byte[].class).map(im -> new ResponseFromOrigin(im, etag));
+                    } else return Mono.empty();
                 });
-//                .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ImageNotFoundException("Image not found")))
-//                .bodyToMono(byte[].class);
     }
 
     @Data
-    @AllArgsConstructor
     public static class ResponseFromOrigin implements Serializable {
         private final byte[] image;
         private final String eTag;
