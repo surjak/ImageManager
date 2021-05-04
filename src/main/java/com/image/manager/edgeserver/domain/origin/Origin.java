@@ -38,10 +38,10 @@ public class Origin {
                 .exchangeToMono(clientResponse -> {
                     if (clientResponse.statusCode().is4xxClientError()) {
                         return Mono.error(new ImageNotFoundException("Image not found"));
-                    } else if (clientResponse.statusCode().is2xxSuccessful()) {
+                    } else {
                         String etag = clientResponse.headers().asHttpHeaders().getETag();
                         return clientResponse.bodyToMono(byte[].class).map(im -> new ResponseFromOrigin(im, etag));
-                    } else return Mono.empty();
+                    }
                 });
     }
 

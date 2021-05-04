@@ -11,7 +11,7 @@
            maxBytesLocalDisk="13G"
            overflowToDisk="true"
            diskPersistent="true"
-           timeToIdleSeconds="300"
+           timeToIdleSeconds="600"
            timeToLiveSeconds="600"
            memoryStoreEvictionPolicy="LRU"
     >
