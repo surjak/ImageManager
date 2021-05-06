@@ -5,14 +5,16 @@ services:
     ports:
       - "8080:8080"
     container_name: spring-boot
+    volumes:
+      - /logs:/logs
     deploy:
       resources:
         limits:
-          cpus: 0.70
-          memory: 700M
+          cpus: 0.50
+          memory: 400M
         reservations:
           cpus: 0.30
-          memory: 300M
+          memory: 200M
   prometheus:
     image: "prom/prometheus"
     ports:
@@ -26,11 +28,11 @@ services:
       - "--storage.tsdb.retention.size=512MB"
       - "--storage.tsdb.path=/etc/prometheus/prometheus"
     container_name: prometheus
-    deploy:
-      resources:
-        limits:
-          cpus: 0.15
-          memory: 120M
-        reservations:
-          cpus: 0.10
-          memory: 80M
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: 0.15
+#          memory: 120M
+#        reservations:
+#          cpus: 0.10
+#          memory: 80M
