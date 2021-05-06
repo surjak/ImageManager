@@ -6,6 +6,8 @@ origins:
       maxConcurrentConnections: 10
     - url: 3.231.123.48
       maxConcurrentConnections: 10
+    - url: http://127.0.0.1:12000
+      maxConcurrentConnections: 10
     
 #Uncomment to see persistent connections output https://www.javaer101.com/en/article/34147137.html
 #
