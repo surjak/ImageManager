@@ -24,7 +24,7 @@ public class GrammarOperationParser implements OperationParser {
     private final ImageParamsEvaluator evaluator = new ImageParamsEvaluator();
 
     @Override
-    public List<Operation> fromQuery(String query) {
+    public synchronized List<Operation> fromQuery(String query) {
         ImageParamsLexer serverLogLexer = new ImageParamsLexer(CharStreams.fromString(query));
         CommonTokenStream tokens = new CommonTokenStream(serverLogLexer);
         ImageParamsParser imageParamsParser = new ImageParamsParser(tokens);
