@@ -2,6 +2,7 @@ package com.image.manager.edgeserver.domain.origin;
 
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
 import com.image.manager.edgeserver.domain.operation.Operation;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.SneakyThrows;
@@ -41,6 +42,7 @@ public class OriginFacade {
     private final DistributionSummary originInboundTraffic;
     private final DistributionSummary originOutboundTraffic;
     private final CacheManager cacheManager;
+    private final Counter missCounter;
     private static final String CACHE_NAME = "edgeCache";
     private final BiFunction<String, Signal<? extends Origin.ResponseFromOrigin>, Mono<Void>> writer;
     private final Function<String, Mono<Signal<? extends Origin.ResponseFromOrigin>>> reader;
@@ -74,6 +76,7 @@ public class OriginFacade {
                 Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)))
                 .flatMap(v -> Mono.justOrEmpty(v).materialize());
 
+        this.missCounter = Counter.builder("count.cache.miss").register(mr);
     }
 
     public Mono<ServerResponse> getImageAndApplyOperations(ServerRequest request, String fileName, List<Operation> operations) {
@@ -105,6 +108,7 @@ public class OriginFacade {
                                 .map(origin -> origin.fetchImageFromOrigin(imageName))
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
+                                            missCounter.increment();
                                             System.out.println("From origin");
                                         }
                                 ))
