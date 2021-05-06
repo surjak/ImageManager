@@ -1,0 +1,21 @@
+version: "3.0"
+services:
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    network_mode: "host"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:7.1.3-ubuntu
+    network_mode: "host"
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboards/:/var/lib/grafana/dashboards/
+      - ./grafana/provisioning/:/etc/grafana/provisioning/

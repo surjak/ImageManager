@@ -68,7 +68,6 @@ public class OriginFacade {
                 .doOnNext(l -> {
                     cacheManager.getCache(CACHE_NAME)
                             .put(k, l);
-                    System.out.println("writing");
                 })
                 .then();
 
@@ -109,7 +108,6 @@ public class OriginFacade {
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
                                             missCounter.increment();
-                                            System.out.println("From origin");
                                         }
                                 ))
                                 .orElse(Mono.error(new UnknownHostException("Origin host not found")))
