@@ -6,4 +6,4 @@ ARG env=abc
 ENV env_arg=${env}
 RUN chmod +x mvnw
 RUN ./mvnw clean package
-ENTRYPOINT ["java", "-Dspring.profiles.active=${env_arg}", "-jar", "target/app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=${env_arg}", "-jar", "-Xms700M", " -Xmx700M", "target/app.jar"]
