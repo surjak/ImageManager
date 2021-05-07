@@ -8,6 +8,8 @@ services:
     volumes:
       - /logs:/logs
       - /dump:/dump
+    environment:
+      - SPRING_PROFILES_ACTIVE=abc
     deploy:
       resources:
         limits:
