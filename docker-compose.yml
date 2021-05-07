@@ -10,14 +10,14 @@ services:
       - /dump:/dump
     environment:
       - SPRING_PROFILES_ACTIVE=abc
-    deploy:
-      resources:
-        limits:
-          cpus: 0.50
-          memory: 400M
-        reservations:
-          cpus: 0.30
-          memory: 200M
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: 0.50
+#          memory: 400M
+#        reservations:
+#          cpus: 0.30
+#          memory: 200M
   prometheus:
     image: "prom/prometheus"
     ports:
