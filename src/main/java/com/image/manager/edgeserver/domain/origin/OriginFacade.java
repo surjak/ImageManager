@@ -16,6 +16,7 @@ import reactor.cache.CacheMono;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Signal;
+import reactor.core.scheduler.Schedulers;
 
 import java.awt.image.BufferedImage;
 import java.net.UnknownHostException;
@@ -68,13 +69,15 @@ public class OriginFacade {
                 .doOnNext(l -> {
                     cacheManager.getCache(CACHE_NAME)
                             .put(k, l);
-                    System.out.println("writing");
                 })
+                .subscribeOn(Schedulers.boundedElastic())
                 .then();
 
         this.reader = k -> Mono.justOrEmpty(
                 Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)))
-                .flatMap(v -> Mono.justOrEmpty(v).materialize());
+                .subscribeOn(Schedulers.boundedElastic()) // to delete?
+                .flatMap(v -> Mono.justOrEmpty(v).materialize())
+        ;
 
         this.missCounter = Counter.builder("count.cache.miss").register(mr);
     }
@@ -109,7 +112,7 @@ public class OriginFacade {
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
                                             missCounter.increment();
-                                            System.out.println("From origin");
+                                            System.out.println(Thread.currentThread() + " From origin");
                                         }
                                 ))
                                 .orElse(Mono.error(new UnknownHostException("Origin host not found")))
