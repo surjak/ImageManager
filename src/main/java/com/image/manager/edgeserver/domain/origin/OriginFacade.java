@@ -70,12 +70,12 @@ public class OriginFacade {
                     cacheManager.getCache(CACHE_NAME)
                             .put(k, l);
                 })
-                .subscribeOn(Schedulers.boundedElastic())
+//                .subscribeOn(Schedulers.boundedElastic())
                 .then();
 
         this.reader = k -> Mono.justOrEmpty(
                 Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)))
-                .subscribeOn(Schedulers.boundedElastic()) // to delete?
+//                .subscribeOn(Schedulers.boundedElastic()) // to delete?
                 .flatMap(v -> Mono.justOrEmpty(v).materialize())
         ;
 
