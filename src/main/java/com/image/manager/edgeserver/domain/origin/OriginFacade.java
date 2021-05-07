@@ -97,7 +97,7 @@ public class OriginFacade {
                 .flatMap(img -> applyOperationsOnImage(operations, img, fileName))
                 .map(imageConverter::bufferedImageToByteArray)
                 .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
-                .flatMap(p -> ok().eTag(p.getETag()).cacheControl(CacheControl.maxAge(Duration.ofHours(1))).contentType(MediaType.IMAGE_PNG).body(Mono.justOrEmpty(p.getImage()), byte[].class));
+                .flatMap(p -> ok().eTag(Optional.ofNullable(p.getETag()).orElse("default-etag")).cacheControl(CacheControl.maxAge(Duration.ofHours(1))).contentType(MediaType.IMAGE_PNG).body(Mono.justOrEmpty(p.getImage()), byte[].class));
     }
 
     @SneakyThrows
