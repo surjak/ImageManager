@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
+import java.time.Duration;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,7 +38,9 @@ public class OriginConfiguration {
     }
 
     public WebClient initWebClient(int maxNumberOfConnections) {
-        ConnectionProvider connectionProvider = ConnectionProvider.builder("connectionProvider").maxConnections(maxNumberOfConnections).build();
+        ConnectionProvider connectionProvider = ConnectionProvider.builder("connectionProvider").maxConnections(maxNumberOfConnections)
+                .pendingAcquireMaxCount(1000)
+                .pendingAcquireTimeout(Duration.ofSeconds(120)).build();
         HttpClient httpClient = HttpClient.create(connectionProvider);
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
         return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()
