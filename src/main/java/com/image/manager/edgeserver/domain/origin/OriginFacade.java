@@ -70,12 +70,12 @@ public class OriginFacade {
                     cacheManager.getCache(CACHE_NAME)
                             .put(k, l);
                 })
-//                .subscribeOn(Schedulers.boundedElastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .then();
 
         this.reader = k -> Mono.justOrEmpty(
                 Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)))
-//                .subscribeOn(Schedulers.boundedElastic()) // to delete?
+                .subscribeOn(Schedulers.boundedElastic()) // to delete?
                 .flatMap(v -> Mono.justOrEmpty(v).materialize())
         ;
 
@@ -107,7 +107,7 @@ public class OriginFacade {
     public Mono<Origin.ResponseFromOrigin> fetchImageFromOrigin(String host, String imageName) {
         return CacheMono.lookup(reader, imageName)
                 .onCacheMissResume(() ->
-                        Optional.ofNullable(this.origins.get(host))
+                         Optional.ofNullable(this.origins.get(host))
                                 .map(origin -> origin.fetchImageFromOrigin(imageName))
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
