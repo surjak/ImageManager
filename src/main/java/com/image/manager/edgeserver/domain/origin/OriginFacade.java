@@ -105,9 +105,9 @@ public class OriginFacade {
 
     @SneakyThrows
     public Mono<Origin.ResponseFromOrigin> fetchImageFromOrigin(String host, String imageName) {
-        return CacheMono.lookup(reader, imageName)
-                .onCacheMissResume(() ->
-                         Optional.ofNullable(this.origins.get(host))
+//        return CacheMono.lookup(reader, imageName)
+//                .onCacheMissResume(() ->
+                         return Optional.ofNullable(this.origins.get(host))
                                 .map(origin -> origin.fetchImageFromOrigin(imageName))
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
@@ -115,9 +115,9 @@ public class OriginFacade {
                                             System.out.println(Thread.currentThread() + " From origin");
                                         }
                                 ))
-                                .orElse(Mono.error(new UnknownHostException("Origin host not found")))
+                                .orElse(Mono.error(new UnknownHostException("Origin host not found")));
 
-                ).andWriteWith(writer);
+//                ).andWriteWith(writer);
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img, String fileName) {
