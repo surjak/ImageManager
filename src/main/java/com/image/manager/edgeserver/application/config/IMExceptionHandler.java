@@ -26,6 +26,11 @@ public class IMExceptionHandler implements WebExceptionHandler {
             serverWebExchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
             return serverWebExchange.getResponse().setComplete();
         }
+        if(throwable instanceof Exception) {
+            System.out.println("eeee");
+            serverWebExchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
+            return serverWebExchange.getResponse().setComplete();
+        }
         return Mono.error(throwable);
     }
 }

@@ -33,8 +33,10 @@ public class ScaleOperation extends Operation {
 
     @Override
     protected void fixMissingProperties(BufferedImage image) {
-        if (this.w == null && this.h == null) {
+        if (this.w == null) {
             this.w = image.getWidth();
+        }
+        if (this.h == null) {
             this.h = image.getHeight();
         }
 
