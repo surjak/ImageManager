@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
@@ -22,11 +25,12 @@ public class Origin {
     @Getter
     private final int maxConcurrentConnections;
     private final WebClient webClient;
-
-    public Origin(OriginProperties.OriginHost host, WebClient webClient) {
+    ThreadPoolTaskExecutor taskExecutor;
+    public Origin(OriginProperties.OriginHost host, WebClient webClient, ThreadPoolTaskExecutor taskExecutor) {
         this.host = host.getUrl();
         this.maxConcurrentConnections = host.getMaxConcurrentConnections();
         this.webClient = webClient;
+        this.taskExecutor = taskExecutor;
     }
 
     @SneakyThrows
@@ -42,7 +46,7 @@ public class Origin {
                         String etag = clientResponse.headers().asHttpHeaders().getETag();
                         return clientResponse.bodyToMono(byte[].class).map(im -> new ResponseFromOrigin(im, etag));
                     }
-                });
+                }).publishOn(Schedulers.fromExecutor(taskExecutor));
     }
 
     @Data
@@ -50,5 +54,6 @@ public class Origin {
         private final byte[] image;
         private final String eTag;
     }
+
 
 }

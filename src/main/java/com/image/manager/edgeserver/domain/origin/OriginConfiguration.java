@@ -3,11 +3,13 @@ package com.image.manager.edgeserver.domain.origin;
 import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -24,7 +26,8 @@ public class OriginConfiguration {
     public OriginFacade originFacade(OriginProperties originProperties,
                                      BufferedImageConverter imageConverter,
                                      PrometheusMeterRegistry mr,
-                                     CacheManager cacheManager) {
+                                     CacheManager cacheManager,
+                                     @Qualifier("custom") ThreadPoolTaskExecutor taskExecutor) {
 
         return new OriginFacade(
                 cacheManager,
@@ -32,7 +35,7 @@ public class OriginConfiguration {
                 originProperties
                         .getHosts()
                         .stream()
-                        .map(host -> new Origin(host, initWebClient(host.getMaxConcurrentConnections())))
+                        .map(host -> new Origin(host, initWebClient(host.getMaxConcurrentConnections()), taskExecutor))
                         .collect(Collectors.toList()),
                 mr);
     }

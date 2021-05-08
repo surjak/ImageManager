@@ -21,6 +21,7 @@ import reactor.core.scheduler.Schedulers;
 import java.awt.image.BufferedImage;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,15 +68,22 @@ public class OriginFacade {
         this.writer = (k, val) -> Mono.just(val)
                 .dematerialize()
                 .doOnNext(l -> {
+
+                    if(Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)).isEmpty()){
+                        String[] strings = k.split("\"<SEPARATOR>\"");
+                        Arrays.stream(strings).findFirst().ifPresent(key -> cacheManager.getCache(CACHE_NAME)
+                                .put(k, l));
+                    }
+
                     cacheManager.getCache(CACHE_NAME)
                             .put(k, l);
                 })
-                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.boundedElastic())
                 .then();
 
         this.reader = k -> Mono.justOrEmpty(
                 Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)))
-                .subscribeOn(Schedulers.boundedElastic()) // to delete?
+                .publishOn(Schedulers.boundedElastic()) // to delete?
                 .doOnNext(s -> {
                     System.out.println("reading from cache '" + k + "'");
                 })
@@ -92,29 +100,47 @@ public class OriginFacade {
                 .stream()
                 .findFirst()
                 .orElse(request.uri().getHost());
-        AtomicReference<Origin.ResponseFromOrigin> i = new AtomicReference<>();
+//        AtomicReference<Origin.ResponseFromOrigin> i = new AtomicReference<>();
         String query = request.uri().getQuery();
-        if(query == null) {
+        if (query == null) {
             query = "";
         }
 
-        return fetchImageFromOrigin(host, fileName, query)
-                .map(imgBytes -> {
-                    i.set(imgBytes);
-                    originOutboundTraffic.record(imgBytes.getImage().length);
-                    return imageConverter.byteArrayToBufferedImage(imgBytes.getImage());
-                })
-                .flatMap(img -> applyOperationsOnImage(operations, img, fileName))
-                .map(imageConverter::bufferedImageToByteArray)
-                .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
+        return fetchImageFromOrigin(host, fileName, query, operations)
+//                .map(imgBytes -> {
+//                    i.set(imgBytes);
+//                    originOutboundTraffic.record(imgBytes.getImage().length);
+//                    return imageConverter.byteArrayToBufferedImage(imgBytes.getImage());
+//                })
+//                .flatMap(img -> applyOperationsOnImage(operations, img, fileName))
+//                .map(imageConverter::bufferedImageToByteArray)
+//                .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
                 .flatMap(p -> ok().eTag(Optional.ofNullable(p.getETag()).orElse("default-etag")).cacheControl(CacheControl.maxAge(Duration.ofHours(1))).contentType(MediaType.IMAGE_PNG).body(Mono.justOrEmpty(p.getImage()), byte[].class));
     }
 
     @SneakyThrows
-    public Mono<Origin.ResponseFromOrigin> fetchImageFromOrigin(String host, String imageName, String query) {
-        return CacheMono.lookup(reader, imageName + query)
-                .onCacheMissResume(() ->
-                          Optional.ofNullable(this.origins.get(host))
+    public Mono<Origin.ResponseFromOrigin> fetchImageFromOrigin(String host, String imageName, String query, List<Operation> operations) {
+//        return CacheMono.lookup(reader, imageName + "<SEPARATOR>" + query)
+//                .onCacheMissResume(() ->
+
+        AtomicReference<Origin.ResponseFromOrigin> i = new AtomicReference<>();
+
+        return Mono.justOrEmpty(Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(imageName + "<SEPARATOR>" + query, Origin.ResponseFromOrigin.class)))
+                .switchIfEmpty(
+                        Mono.justOrEmpty(Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(imageName, Origin.ResponseFromOrigin.class)))
+                        .map(imgBytes -> {
+                            i.set(imgBytes);
+                            return imageConverter.byteArrayToBufferedImage(imgBytes.getImage());
+                        })
+                        .flatMap(img -> applyOperationsOnImage(operations, img, imageName))
+                        .map(imageConverter::bufferedImageToByteArray)
+                        .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
+                        .doOnSuccess(r -> {
+                            cacheManager.getCache(CACHE_NAME)
+                                    .put(imageName, r);
+                        })
+                ).switchIfEmpty(
+                        Optional.ofNullable(this.origins.get(host))
                                 .map(origin -> origin.fetchImageFromOrigin(imageName))
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
@@ -123,7 +149,22 @@ public class OriginFacade {
                                         }
                                 ))
                                 .orElse(Mono.error(new UnknownHostException("Origin host not found")))
-                ).andWriteWith(writer);
+                                .map(imgBytes -> {
+                                    i.set(imgBytes);
+                                    originOutboundTraffic.record(imgBytes.getImage().length);
+                                    return imageConverter.byteArrayToBufferedImage(imgBytes.getImage());
+                                })
+                                .flatMap(img -> applyOperationsOnImage(operations, img, imageName))
+                                .map(imageConverter::bufferedImageToByteArray)
+                                .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
+                        .doOnSuccess(r -> {
+                            cacheManager.getCache(CACHE_NAME)
+                                    .put(imageName + "<SEPARATOR>" + query, r);
+                            cacheManager.getCache(CACHE_NAME)
+                                    .put(imageName , r);
+                        })
+                                );
+//                ).andWriteWith(writer);
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img, String fileName) {
