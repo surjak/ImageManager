@@ -126,7 +126,7 @@ public class OriginFacade {
 
         AtomicReference<Origin.ResponseFromOrigin> i = new AtomicReference<>();
 
-        return Mono.justOrEmpty(Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(imageName + "<SEPARATOR>" + query, Origin.ResponseFromOrigin.class)))
+        return Mono.justOrEmpty(Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(imageName + query, Origin.ResponseFromOrigin.class)))
                 .switchIfEmpty(
                         Mono.justOrEmpty(Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(imageName, Origin.ResponseFromOrigin.class)))
                                 .map(imgBytes -> {
@@ -137,8 +137,11 @@ public class OriginFacade {
                                 .map(imageConverter::bufferedImageToByteArray)
                                 .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
                                 .doOnSuccess(r -> {
-                                    cacheManager.getCache(CACHE_NAME)
-                                            .put(imageName, r);
+                                    if(!operations.isEmpty()){
+                                        System.out.println("alamakota");
+                                        cacheManager.getCache(CACHE_NAME)
+                                                .put(imageName + query, r);
+                                    }
                                 })
                 ).switchIfEmpty(
                         Optional.ofNullable(this.origins.get(host))
@@ -161,8 +164,11 @@ public class OriginFacade {
                                 .map(imageConverter::bufferedImageToByteArray)
                                 .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
                                 .doOnSuccess(r -> {
-                                    cacheManager.getCache(CACHE_NAME)
-                                            .put(imageName + "<SEPARATOR>" + query, r);
+                                    if(!operations.isEmpty()){
+                                        System.out.println("alamakota2");
+                                        cacheManager.getCache(CACHE_NAME)
+                                                .put(imageName + query, r);
+                                    }
                                 })
                 );
 //                ).andWriteWith(writer);
