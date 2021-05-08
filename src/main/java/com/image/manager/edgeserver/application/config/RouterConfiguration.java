@@ -12,6 +12,8 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
@@ -48,8 +50,9 @@ public class RouterConfiguration {
                         serverRequest ->
                                 Mono.zip(
                                         Mono.justOrEmpty(serverRequest.uri().getQuery())
+                                                .doOnNext(q -> System.out.println("For query: " +q))
                                                 .map(operationParser::fromQuery)
-                                                .switchIfEmpty(Mono.just(java.util.List.of())),
+                                                .switchIfEmpty(Mono.just(List.of())),
                                         Mono.justOrEmpty(serverRequest.pathVariable("fileName")),
                                         Mono.justOrEmpty(serverRequest)
                                 )
