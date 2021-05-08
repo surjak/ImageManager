@@ -4,7 +4,7 @@
          monitoring="autodetect"
          dynamicConfig="true">
 
-    <diskStore path="./xxxcache" />
+    <diskStore path="/data/xxxcache" />
 
     <cache name="edgeCache"
            maxBytesLocalHeap="100M"

@@ -4,4 +4,5 @@ COPY . /opt/edgeserver
 EXPOSE 8080
 RUN chmod +x mvnw
 RUN ./mvnw clean package
-ENTRYPOINT ["java", "-Xmx600M" ,"-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/dump", "-jar", "target/app.jar"]
+ENTRYPOINT ["java" ,"-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/dump", "-jar", "target/app.jar"]
+#, "-Xmx600M"
