@@ -50,7 +50,6 @@ public class RouterConfiguration {
                         serverRequest ->
                                 Mono.zip(
                                         Mono.justOrEmpty(serverRequest.uri().getQuery())
-                                                .doOnNext(q -> System.out.println("For query: " +q))
                                                 .map(operationParser::fromQuery)
                                                 .switchIfEmpty(Mono.just(List.of())),
                                         Mono.justOrEmpty(serverRequest.pathVariable("fileName")),

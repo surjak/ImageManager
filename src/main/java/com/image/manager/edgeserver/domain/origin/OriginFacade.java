@@ -73,7 +73,6 @@ public class OriginFacade {
         if (query == null) {
             query = "";
         }
-        System.out.println(String.format("https://<origin>/%s/%s", fileName, query));
 
         return fetchImageFromOrigin(host, fileName, query, operations)
                 .flatMap(p -> ok().eTag(Optional.ofNullable(p.getETag()).orElse("default-etag")).cacheControl(CacheControl.maxAge(Duration.ofHours(1))).contentType(MediaType.IMAGE_PNG).body(Mono.justOrEmpty(p.getImage()), byte[].class));
@@ -96,7 +95,6 @@ public class OriginFacade {
                                 .map(a -> {
                                     Origin.ResponseFromOrigin responseFromOrigin = new Origin.ResponseFromOrigin(a, i.get().getETag());
                                     if (!operations.isEmpty()) {
-                                        System.out.println("alamakota");
                                         cacheManager.getCache(CACHE_NAME)
                                                 .put(imageName + query, responseFromOrigin);
                                     }
@@ -108,13 +106,11 @@ public class OriginFacade {
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
                                             missCounter.increment();
-                                            System.out.println(Thread.currentThread() + " From origin");
                                         }
                                 ))
                                 .orElse(Mono.error(new UnknownHostException("Origin host not found")))
                                 .map(imgBytes -> {
                                     i.set(imgBytes);
-                                    originOutboundTraffic.record(imgBytes.getImage().length);
                                     cacheManager.getCache(CACHE_NAME)
                                             .put(imageName, imgBytes);
                                     return imageConverter.byteArrayToBufferedImage(imgBytes.getImage());
@@ -124,12 +120,13 @@ public class OriginFacade {
                                 .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
                                 .doOnSuccess(r -> {
                                     if (!operations.isEmpty()) {
-                                        System.out.println("alamakota2");
                                         cacheManager.getCache(CACHE_NAME)
                                                 .put(imageName + query, r);
                                     }
                                 })
-                );
+                ).doOnNext( r -> {
+                    originOutboundTraffic.record(r.getImage().length);
+                });
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img, String fileName) {
