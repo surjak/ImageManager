@@ -12,22 +12,16 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.cache.CacheMono;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Signal;
-import reactor.core.scheduler.Schedulers;
 
 import java.awt.image.BufferedImage;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
@@ -46,8 +40,6 @@ public class OriginFacade {
     private final CacheManager cacheManager;
     private final Counter missCounter;
     private static final String CACHE_NAME = "edgeCache";
-//    private final BiFunction<String, Signal<? extends Origin.ResponseFromOrigin>, Mono<Void>> writer;
-//    private final Function<String, Mono<Signal<? extends Origin.ResponseFromOrigin>>> reader;
 
     public OriginFacade(
             CacheManager cacheManager,
@@ -65,30 +57,6 @@ public class OriginFacade {
                 .builder("edge.outbound.traffic.size")
                 .baseUnit("bytes")
                 .register(mr);
-//        this.writer = (k, val) -> Mono.just(val)
-//                .dematerialize()
-//                .doOnNext(l -> {
-//
-//                    if(Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)).isEmpty()){
-//                        String[] strings = k.split("\"<SEPARATOR>\"");
-//                        Arrays.stream(strings).findFirst().ifPresent(key -> cacheManager.getCache(CACHE_NAME)
-//                                .put(k, l));
-//                    }
-//
-//                    cacheManager.getCache(CACHE_NAME)
-//                            .put(k, l);
-//                })
-//                .publishOn(Schedulers.boundedElastic())
-//                .then();
-//
-//        this.reader = k -> Mono.justOrEmpty(
-//                Optional.ofNullable(cacheManager.getCache(CACHE_NAME).get(k, Origin.ResponseFromOrigin.class)))
-//                .publishOn(Schedulers.boundedElastic()) // to delete?
-//                .doOnNext(s -> {
-//                    System.out.println("reading from cache '" + k + "'");
-//                })
-//                .flatMap(v -> Mono.justOrEmpty(v).materialize())
-//        ;
 
         this.missCounter = Counter.builder("count.cache.miss").register(mr);
     }
@@ -100,7 +68,7 @@ public class OriginFacade {
                 .stream()
                 .findFirst()
                 .orElse(request.uri().getHost());
-//        AtomicReference<Origin.ResponseFromOrigin> i = new AtomicReference<>();
+
         String query = request.uri().getQuery();
         if (query == null) {
             query = "";
@@ -108,21 +76,11 @@ public class OriginFacade {
         System.out.println(String.format("https://<origin>/%s/%s", fileName, query));
 
         return fetchImageFromOrigin(host, fileName, query, operations)
-//                .map(imgBytes -> {
-//                    i.set(imgBytes);
-//                    originOutboundTraffic.record(imgBytes.getImage().length);
-//                    return imageConverter.byteArrayToBufferedImage(imgBytes.getImage());
-//                })
-//                .flatMap(img -> applyOperationsOnImage(operations, img, fileName))
-//                .map(imageConverter::bufferedImageToByteArray)
-//                .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
                 .flatMap(p -> ok().eTag(Optional.ofNullable(p.getETag()).orElse("default-etag")).cacheControl(CacheControl.maxAge(Duration.ofHours(1))).contentType(MediaType.IMAGE_PNG).body(Mono.justOrEmpty(p.getImage()), byte[].class));
     }
 
     @SneakyThrows
     public Mono<Origin.ResponseFromOrigin> fetchImageFromOrigin(String host, String imageName, String query, List<Operation> operations) {
-//        return CacheMono.lookup(reader, imageName + "<SEPARATOR>" + query)
-//                .onCacheMissResume(() ->
 
         AtomicReference<Origin.ResponseFromOrigin> i = new AtomicReference<>();
 
@@ -135,13 +93,14 @@ public class OriginFacade {
                                 })
                                 .flatMap(img -> applyOperationsOnImage(operations, img, imageName))
                                 .map(imageConverter::bufferedImageToByteArray)
-                                .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
-                                .doOnSuccess(r -> {
-                                    if(!operations.isEmpty()){
+                                .map(a -> {
+                                    Origin.ResponseFromOrigin responseFromOrigin = new Origin.ResponseFromOrigin(a, i.get().getETag());
+                                    if (!operations.isEmpty()) {
                                         System.out.println("alamakota");
                                         cacheManager.getCache(CACHE_NAME)
-                                                .put(imageName + query, r);
+                                                .put(imageName + query, responseFromOrigin);
                                     }
+                                    return responseFromOrigin;
                                 })
                 ).switchIfEmpty(
                         Optional.ofNullable(this.origins.get(host))
@@ -164,14 +123,13 @@ public class OriginFacade {
                                 .map(imageConverter::bufferedImageToByteArray)
                                 .map(a -> new Origin.ResponseFromOrigin(a, i.get().getETag()))
                                 .doOnSuccess(r -> {
-                                    if(!operations.isEmpty()){
+                                    if (!operations.isEmpty()) {
                                         System.out.println("alamakota2");
                                         cacheManager.getCache(CACHE_NAME)
                                                 .put(imageName + query, r);
                                     }
                                 })
                 );
-//                ).andWriteWith(writer);
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img, String fileName) {

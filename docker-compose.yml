@@ -8,6 +8,7 @@ services:
     volumes:
       - /logs:/logs
       - /dump:/dump
+      - /data:/data
     environment:
       - SPRING_PROFILES_ACTIVE=abc
 #    deploy:
