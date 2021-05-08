@@ -90,8 +90,12 @@ public class OriginFacade {
                 .findFirst()
                 .orElse(request.uri().getHost());
         AtomicReference<Origin.ResponseFromOrigin> i = new AtomicReference<>();
+        String query = request.uri().getQuery();
+        if(query == null) {
+            query = "";
+        }
 
-        return fetchImageFromOrigin(host, fileName)
+        return fetchImageFromOrigin(host, fileName, query)
                 .map(imgBytes -> {
                     i.set(imgBytes);
                     originOutboundTraffic.record(imgBytes.getImage().length);
@@ -104,10 +108,10 @@ public class OriginFacade {
     }
 
     @SneakyThrows
-    public Mono<Origin.ResponseFromOrigin> fetchImageFromOrigin(String host, String imageName) {
-//        return CacheMono.lookup(reader, imageName)
-//                .onCacheMissResume(() ->
-                         return Optional.ofNullable(this.origins.get(host))
+    public Mono<Origin.ResponseFromOrigin> fetchImageFromOrigin(String host, String imageName, String query) {
+        return CacheMono.lookup(reader, imageName + query)
+                .onCacheMissResume(() ->
+                          Optional.ofNullable(this.origins.get(host))
                                 .map(origin -> origin.fetchImageFromOrigin(imageName))
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
@@ -115,9 +119,8 @@ public class OriginFacade {
                                             System.out.println(Thread.currentThread() + " From origin");
                                         }
                                 ))
-                                .orElse(Mono.error(new UnknownHostException("Origin host not found")));
-
-//                ).andWriteWith(writer);
+                                .orElse(Mono.error(new UnknownHostException("Origin host not found")))
+                ).andWriteWith(writer);
     }
 
     private Mono<BufferedImage> applyOperationsOnImage(List<Operation> operations, BufferedImage img, String fileName) {
