@@ -31,9 +31,9 @@ jobs:
         with:
           push: true
           tags: aghimagemanager/image_manager:latest
-  deploy:
-    needs: push
-    runs-on: prod
-    steps:
-      - name: Run script
-        run: sh /home/ubuntu/setupIM.sh
+#  deploy:
+#    needs: push
+#    runs-on: prod
+#    steps:
+#      - name: Run script
+#        run: sh /home/ubuntu/setupIM.sh
