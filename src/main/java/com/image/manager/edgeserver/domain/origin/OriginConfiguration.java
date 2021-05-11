@@ -42,14 +42,14 @@ public class OriginConfiguration {
 
     public WebClient initWebClient(int maxNumberOfConnections) {
         ConnectionProvider connectionProvider = ConnectionProvider.builder("connectionProvider").maxConnections(maxNumberOfConnections)
-                .pendingAcquireMaxCount(1000)
-                .pendingAcquireTimeout(Duration.ofSeconds(120)).build();
+                .pendingAcquireMaxCount(250)
+                .pendingAcquireTimeout(Duration.ofSeconds(60)).build();
         HttpClient httpClient = HttpClient.create(connectionProvider);
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
         return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()
                 .codecs(configurer -> configurer
                         .defaultCodecs()
-                        .maxInMemorySize(16 * 1024 * 1024))
+                        .maxInMemorySize(8 * 1024 * 1024))
                 .build())
                 .clientConnector(connector)
                 .build();
