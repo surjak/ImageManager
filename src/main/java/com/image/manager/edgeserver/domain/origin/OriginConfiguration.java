@@ -43,7 +43,7 @@ public class OriginConfiguration {
 
     public WebClient initWebClient(int maxNumberOfConnections) {
         ConnectionProvider connectionProvider = ConnectionProvider.builder("connectionProvider").maxConnections(maxNumberOfConnections)
-                .pendingAcquireMaxCount(30)
+                .pendingAcquireMaxCount(50)
                 .pendingAcquireTimeout(Duration.ofSeconds(30)).build();
         HttpClient httpClient = HttpClient.create(connectionProvider);
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
