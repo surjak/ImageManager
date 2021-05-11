@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -43,14 +44,14 @@ public class OriginConfiguration {
 
     public WebClient initWebClient(int maxNumberOfConnections) {
         ConnectionProvider connectionProvider = ConnectionProvider.builder("connectionProvider").maxConnections(maxNumberOfConnections)
-                .pendingAcquireMaxCount(50)
-                .pendingAcquireTimeout(Duration.ofSeconds(30)).build();
+                .pendingAcquireMaxCount(500)
+                .pendingAcquireTimeout(Duration.ofSeconds(60)).build();
         HttpClient httpClient = HttpClient.create(connectionProvider);
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
         return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()
                 .codecs(configurer -> configurer
                         .defaultCodecs()
-                        .maxInMemorySize(8 * 1024 * 1024))
+                        .maxInMemorySize(16 * 1024 * 1024))
                 .build())
                 .clientConnector(connector)
                 .build();

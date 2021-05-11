@@ -7,7 +7,7 @@
     <diskStore path="/data/xxxcache" />
 
     <cache name="edgeCache"
-           maxBytesLocalHeap="50M"
+           maxEntriesLocalHeap="50"
            maxBytesLocalDisk="13G"
            overflowToDisk="true"
            diskPersistent="true"
