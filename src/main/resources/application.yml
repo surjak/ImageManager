@@ -1,7 +1,7 @@
 origins:
   hosts:
     - url: 10.0.0.102
-      maxConcurrentConnections: 50
+      maxConcurrentConnections: 15
 
 management:
   endpoints:
