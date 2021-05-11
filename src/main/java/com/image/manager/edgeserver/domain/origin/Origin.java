@@ -25,10 +25,12 @@ public class Origin {
     @Getter
     private final int maxConcurrentConnections;
     private final WebClient webClient;
-    public Origin(OriginProperties.OriginHost host, WebClient webClient) {
+    ThreadPoolTaskExecutor taskExecutor;
+    public Origin(OriginProperties.OriginHost host, WebClient webClient, ThreadPoolTaskExecutor taskExecutor) {
         this.host = host.getUrl();
         this.maxConcurrentConnections = host.getMaxConcurrentConnections();
         this.webClient = webClient;
+        this.taskExecutor = taskExecutor;
     }
 
     @SneakyThrows
@@ -44,7 +46,7 @@ public class Origin {
                         String etag = clientResponse.headers().asHttpHeaders().getETag();
                         return clientResponse.bodyToMono(byte[].class).map(im -> new ResponseFromOrigin(im, etag));
                     }
-                });
+                }).publishOn(Schedulers.fromExecutor(taskExecutor));
     }
 
     @Data

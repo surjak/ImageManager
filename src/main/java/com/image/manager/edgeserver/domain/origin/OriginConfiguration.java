@@ -26,8 +26,9 @@ public class OriginConfiguration {
     public OriginFacade originFacade(OriginProperties originProperties,
                                      BufferedImageConverter imageConverter,
                                      PrometheusMeterRegistry mr,
-                                     CacheManager cacheManager
-                                     ) {
+                                     CacheManager cacheManager,
+                                     @Qualifier("custom") ThreadPoolTaskExecutor taskExecutor
+    ) {
 
         return new OriginFacade(
                 cacheManager,
@@ -35,7 +36,7 @@ public class OriginConfiguration {
                 originProperties
                         .getHosts()
                         .stream()
-                        .map(host -> new Origin(host, initWebClient(host.getMaxConcurrentConnections())))
+                        .map(host -> new Origin(host, initWebClient(host.getMaxConcurrentConnections()), taskExecutor))
                         .collect(Collectors.toList()),
                 mr);
     }

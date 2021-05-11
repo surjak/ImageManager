@@ -31,15 +31,15 @@ public class CacheConfig {
         return managerFactoryBean;
     }
 
-//    @Qualifier("custom")
-//    @Bean
-//    public ThreadPoolTaskExecutor taskExecutor() {
-//        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-//        executor.setCorePoolSize(5);
-//        executor.setMaxPoolSize(10);
-//        executor.setQueueCapacity(100);
-//        executor.setThreadNamePrefix("slow-");
-//        executor.initialize();
-//        return executor;
-//    }
+    @Qualifier("custom")
+    @Bean
+    public ThreadPoolTaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("slow-");
+        executor.initialize();
+        return executor;
+    }
 }
