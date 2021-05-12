@@ -1,6 +1,7 @@
 package com.image.manager.edgeserver.application.config.cache;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
@@ -20,15 +21,16 @@ import java.util.Objects;
 public class CacheConfig {
 
     @Bean
-    public CacheManager cacheManager() {
-        return new EhCacheCacheManager(Objects.requireNonNull(ehCacheCacheManager().getObject()));
-    }
-    @Bean
-    public EhCacheManagerFactoryBean ehCacheCacheManager() {
+    public EhCacheManagerFactoryBean ehCacheCacheManager(@Value("${spring.cache.ehcache.config}") String configPath) {
         EhCacheManagerFactoryBean managerFactoryBean = new EhCacheManagerFactoryBean();
-        managerFactoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
+        managerFactoryBean.setConfigLocation(new ClassPathResource(configPath));
         managerFactoryBean.setShared(true);
         return managerFactoryBean;
+    }
+
+    @Bean
+    public CacheManager cacheManager(EhCacheManagerFactoryBean ehCacheManager) {
+        return new EhCacheCacheManager(Objects.requireNonNull(ehCacheManager.getObject()));
     }
 
     @Qualifier("custom")

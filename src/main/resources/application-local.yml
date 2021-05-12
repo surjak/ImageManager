@@ -6,6 +6,11 @@ origins:
       maxConcurrentConnections: 10
     - url: 3.231.123.48
       maxConcurrentConnections: 10
+
+spring:
+  cache:
+    ehcache:
+      config: ehcache-local.xml
     
 #Uncomment to see persistent connections output https://www.javaer101.com/en/article/34147137.html
 #

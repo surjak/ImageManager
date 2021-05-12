@@ -24,8 +24,8 @@ management:
 
 spring:
   cache:
-    jcache:
-      config: classpath:ehcache.xml
+    ehcache:
+      config: ehcache.xml
 
 logging:
   file:
