@@ -9,7 +9,7 @@ origins:
 
 spring:
   cache:
-    ehcache:
+    jcache:
       config: ehcache-local.xml
     
 #Uncomment to see persistent connections output https://www.javaer101.com/en/article/34147137.html

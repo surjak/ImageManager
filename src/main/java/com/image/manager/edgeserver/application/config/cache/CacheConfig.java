@@ -21,7 +21,7 @@ import java.util.Objects;
 public class CacheConfig {
 
     @Bean
-    public EhCacheManagerFactoryBean ehCacheCacheManager(@Value("${spring.cache.ehcache.config}") String configPath) {
+    public EhCacheManagerFactoryBean ehCacheCacheManager(@Value("${spring.cache.jcache.config}") String configPath) {
         EhCacheManagerFactoryBean managerFactoryBean = new EhCacheManagerFactoryBean();
         managerFactoryBean.setConfigLocation(new ClassPathResource(configPath));
         managerFactoryBean.setShared(true);
