@@ -7,13 +7,7 @@ public class NumberUtils {
             return 1;
         }
 
-        int digits = 0;
-        while(value > 0) {
-            value /= 10;
-            digits++;
-        }
-
-        return digits;
+        return (int) Math.floor(Math.log10(value) + 1);
     }
 
 }
