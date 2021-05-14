@@ -7,7 +7,9 @@ import org.springframework.cache.ehcache.EhCacheCache;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.image.manager.edgeserver.common.NumberUtils.getDigits;
 
@@ -29,18 +31,23 @@ public class CacheService {
     }
 
     public void purgeOne(int idx) {
-        String keyPattern = String.format("%s%s.*", this.filePrefix, toIdxStr(idx));
-        log.info("Attempting to remove cache for keys with pattern: {}", keyPattern);
+        String keyPattern = String.format("%s%s", this.filePrefix, toIdxStr(idx));
 
         this.cache.getKeys()
                 .stream()
                 .map(Object::toString)
-                .filter(key -> ((String) key).matches(keyPattern))
+                .filter(key -> ((String) key).startsWith(keyPattern))
                 .forEach(this.cache::remove);
     }
 
     public void purgeAll(Collection<Integer> idxs) {
-        idxs.forEach(this::purgeOne);
+        List<String> keyPatterns = idxs.stream().map(idx -> String.format("%s%s", this.filePrefix, toIdxStr(idx))).collect(Collectors.toList());
+
+        this.cache.getKeys()
+                .stream()
+                .map(Object::toString)
+                .filter(key -> keyPatterns.stream().anyMatch(s -> ((String) key).startsWith(s)))
+                .forEach(this.cache::remove);
     }
 
     private String toIdxStr(int idx) {
