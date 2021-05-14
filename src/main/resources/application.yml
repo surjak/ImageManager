@@ -25,7 +25,12 @@ management:
 spring:
   cache:
     jcache:
-      config: classpath:ehcache.xml
+      config: ehcache.xml
+
+ehcache:
+  properties:
+    cache-name: "edgeCache"
+    file-prefix: "COCO_train2014_"
 
 logging:
   file:

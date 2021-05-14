@@ -7,12 +7,12 @@
     <diskStore path="/data/xxxcache" />
 
     <cache name="edgeCache"
-           maxBytesLocalHeap="100M"
+           maxEntriesLocalHeap="50"
            maxBytesLocalDisk="13G"
            overflowToDisk="true"
            diskPersistent="true"
-           timeToIdleSeconds="3600"
-           timeToLiveSeconds="3600"
+           timeToIdleSeconds="86400"
+           timeToLiveSeconds="86400"
            memoryStoreEvictionPolicy="LRU"
     >
 <!--        <persistence strategy="localTempSwap"/>-->
