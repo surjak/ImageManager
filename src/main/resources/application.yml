@@ -1,6 +1,8 @@
 origins:
   hosts:
-    - url: 10.0.0.102
+    - url: a.com
+      maxConcurrentConnections: 50
+    - url: b.com
       maxConcurrentConnections: 50
 
 management:

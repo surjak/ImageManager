@@ -37,7 +37,8 @@ public class Origin {
     public Mono<ResponseFromOrigin> fetchImageFromOrigin(String imageName) {
         return webClient
                 .get()
-                .uri(new URI(host + "/" + imageName.trim()))
+//                .uri(new URI(host + "/" + imageName.trim()))
+                .uri(new URI("10.0.0.102" + "/" + imageName.trim()))
                 .accept(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG)
                 .exchangeToMono(clientResponse -> {
                     if (clientResponse.statusCode().is4xxClientError()) {

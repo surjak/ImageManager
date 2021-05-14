@@ -101,7 +101,8 @@ public class OriginFacade {
                                     return responseFromOrigin;
                                 })
                 ).switchIfEmpty(
-                        Optional.ofNullable(this.origins.get(host))
+                        Optional.of(Optional.ofNullable(this.origins.get(host))
+                                .orElse(this.origins.values().iterator().next()))
                                 .map(origin -> origin.fetchImageFromOrigin(imageName))
                                 .map(result -> result.doOnSuccess(imgBytes -> {
                                             originInboundTraffic.record(imgBytes.getImage().length);
