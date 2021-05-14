@@ -4,7 +4,7 @@ services:
     image: nginx:1.19-alpine
     network_mode: host
     volumes:
-      - ./nginx/certs:/data/nginx/certs
+      - ./certs:/data/nginx/certs
       - ./nginx:/etc/nginx/conf.d
   spring-boot:
     image: "aghimagemanager/image_manager"
