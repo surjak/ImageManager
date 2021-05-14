@@ -21,13 +21,14 @@ public class GrammarOperationParser implements OperationParser {
     private final OperationFactory operationFactory;
 
     private final ParseTreeWalker walker = new ParseTreeWalker();
-    private final ImageParamsEvaluator evaluator = new ImageParamsEvaluator();
 
     @Override
-    public synchronized List<Operation> fromQuery(String query) {
+    public List<Operation> fromQuery(String query) {
         ImageParamsLexer serverLogLexer = new ImageParamsLexer(CharStreams.fromString(query));
         CommonTokenStream tokens = new CommonTokenStream(serverLogLexer);
         ImageParamsParser imageParamsParser = new ImageParamsParser(tokens);
+
+        ImageParamsEvaluator evaluator = new ImageParamsEvaluator();
 
         walker.walk(evaluator, imageParamsParser.params());
 
