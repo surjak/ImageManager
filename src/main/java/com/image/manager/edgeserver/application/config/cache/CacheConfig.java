@@ -1,7 +1,9 @@
 package com.image.manager.edgeserver.application.config.cache;
 
+import com.image.manager.edgeserver.domain.cache.CacheProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
@@ -44,4 +46,11 @@ public class CacheConfig {
         executor.initialize();
         return executor;
     }
+
+    @Bean
+    @ConfigurationProperties(prefix = "ehcache.properties")
+    public CacheProperties cacheProperties() {
+        return new CacheProperties();
+    }
+
 }
