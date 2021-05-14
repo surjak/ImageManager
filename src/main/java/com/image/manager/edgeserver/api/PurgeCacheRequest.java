@@ -30,7 +30,7 @@ public class PurgeCacheRequest {
         private int to;
 
         public Stream<Integer> toRange() {
-            return IntStream.rangeClosed(this.from, this.to).boxed();
+            return IntStream.range(this.from, this.to).boxed();
         }
 
     }
