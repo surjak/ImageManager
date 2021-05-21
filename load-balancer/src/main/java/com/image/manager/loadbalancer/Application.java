@@ -1,4 +1,4 @@
-package com.image.manager.loadbalancerdemoorigin;
+package com.image.manager.loadbalancer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

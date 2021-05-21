@@ -1,33 +1,33 @@
 package com.image.manager.edgeserver.domain.origin;
 
 import com.image.manager.edgeserver.domain.ImageNotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.stream.Collectors;
 
 public class Origin {
 
     @Getter
-    private final String host;
+    private final String hostname;
+
+    @Getter
+    private final String ip;
+
     @Getter
     private final int maxConcurrentConnections;
     private final WebClient webClient;
-    ThreadPoolTaskExecutor taskExecutor;
-    public Origin(OriginProperties.OriginHost host, WebClient webClient, ThreadPoolTaskExecutor taskExecutor) {
-        this.host = host.getUrl();
+//    ThreadPoolTaskExecutor taskExecutor;
+    public Origin(OriginProperties.OriginHost host, WebClient webClient) {
+        this.hostname = host.getHostname();
+        this.ip = host.getIp();
         this.maxConcurrentConnections = host.getMaxConcurrentConnections();
         this.webClient = webClient;
         this.taskExecutor = taskExecutor;

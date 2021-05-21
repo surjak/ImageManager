@@ -1,6 +1,8 @@
 origins:
   hosts:
-    - url: origin-server.herokuapp.com
+    - hostname: origin-server.herokuapp.com
+      ip: origin-server.herokuapp.com
       maxConcurrentConnections: 10
-    - url: origin-server2.herokuapp.com
+    - hostname: origin-server2.herokuapp.com
+      ip: origin-server2.herokuapp.com
       maxConcurrentConnections: 10

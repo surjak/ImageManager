@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 @Configuration
 public class OriginConfiguration {
 
+
+
     @Bean
     public OriginFacade originFacade(OriginProperties originProperties,
                                      BufferedImageConverter imageConverter,

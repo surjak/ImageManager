@@ -16,7 +16,10 @@ origins:
 spring:
   cache:
     jcache:
-      config: ehcache-local.xml
+      config: ehcache-local-1.xml
+
+server:
+  port: 11000
     
 #Uncomment to see persistent connections output https://www.javaer101.com/en/article/34147137.html
 #
