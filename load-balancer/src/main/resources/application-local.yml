@@ -1,0 +1,4 @@
+edge:
+  clients-ips:
+    - "http://localhost:11000"
+    - "http://localhost:12000"
