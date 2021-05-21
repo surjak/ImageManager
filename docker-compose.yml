@@ -18,7 +18,7 @@ services:
       - /data:/data
     environment:
       - SPRING_PROFILES_ACTIVE=abc
-      - JAVA_OPTS=-Xloggc:/data/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/dump
+      - JAVA_OPTS=-Xloggc:/data/gc.log
     networks:
       - edge
 
