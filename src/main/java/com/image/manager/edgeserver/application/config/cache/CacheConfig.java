@@ -35,18 +35,6 @@ public class CacheConfig {
         return new EhCacheCacheManager(Objects.requireNonNull(ehCacheManager.getObject()));
     }
 
-    @Qualifier("custom")
-    @Bean
-    public ThreadPoolTaskExecutor taskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("slow-");
-        executor.initialize();
-        return executor;
-    }
-
     @Bean
     @ConfigurationProperties(prefix = "ehcache.properties")
     public CacheProperties cacheProperties() {

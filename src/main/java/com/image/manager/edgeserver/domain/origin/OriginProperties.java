@@ -12,7 +12,8 @@ public class OriginProperties {
     @Data
     public static class OriginHost {
 
-        private String url;
+        private String hostname;
+        private String ip;
         private int maxConcurrentConnections;
 
     }

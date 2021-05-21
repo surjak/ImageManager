@@ -1,8 +1,10 @@
 origins:
   hosts:
-    - url: a.com
+    - hostname: a.com
+      ip: 10.0.0.2
       maxConcurrentConnections: 50
-    - url: b.com
+    - hostname: b.com
+      ip: 10.0.0.2
       maxConcurrentConnections: 50
 
 management:

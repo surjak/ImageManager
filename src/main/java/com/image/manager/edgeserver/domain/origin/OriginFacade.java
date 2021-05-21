@@ -48,7 +48,7 @@ public class OriginFacade {
             PrometheusMeterRegistry mr) {
         this.imageConverter = imageConverter;
         this.cacheManager = cacheManager;
-        this.origins = origins.stream().collect(Collectors.toMap(Origin::getHost, o -> o));
+        this.origins = origins.stream().collect(Collectors.toMap(Origin::getHostname, o -> o));
         this.originInboundTraffic = DistributionSummary
                 .builder("origin.inbound.traffic.size")
                 .baseUnit("bytes")
@@ -126,6 +126,7 @@ public class OriginFacade {
                                     }
                                 })
                 ).doOnNext( r -> {
+                     // TODO: 21.05.2021  remove additional thread pool???
                     originOutboundTraffic.record(r.getImage().length);
                 });
     }
