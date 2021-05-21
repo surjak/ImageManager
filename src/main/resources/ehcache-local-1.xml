@@ -1,0 +1,21 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="true"
+         monitoring="autodetect"
+         dynamicConfig="true">
+
+    <diskStore path="./data/xxxcache-1" />
+
+    <cache name="edgeCache"
+           maxEntriesLocalHeap="1"
+           maxBytesLocalDisk="13G"
+           overflowToDisk="true"
+           diskPersistent="true"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="3600"
+           memoryStoreEvictionPolicy="LRU"
+    >
+        <!--        <persistence strategy="localTempSwap"/>-->
+    </cache>
+
+</ehcache>

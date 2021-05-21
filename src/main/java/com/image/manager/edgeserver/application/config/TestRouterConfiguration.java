@@ -15,7 +15,9 @@ public class TestRouterConfiguration {
 
     @Bean
     public RouterFunction<ServerResponse> testRoute() {
-        return RouterFunctions.route(GET("/test/healthcheck"), serverRequest -> ok().body(BodyInserters.fromValue("Hello World")));
+        return RouterFunctions.route(GET("/test/healthcheck"), serverRequest -> {
+            return ok().body(BodyInserters.fromValue("Hello World"));
+        });
     }
 
 }
