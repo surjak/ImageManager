@@ -18,7 +18,7 @@ services:
       - /data:/data
     environment:
       - SPRING_PROFILES_ACTIVE=abc
-      - JAVA_OPTS=-Xloggc:/data/gc.log
+      - JAVA_OPTS=-Xloggc:/data/gc.log -Dclient.maxInMemorySize=8
     networks:
       - edge
 

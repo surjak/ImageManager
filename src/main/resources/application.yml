@@ -39,3 +39,6 @@ ehcache:
 logging:
   file:
     name: /logs
+
+client:
+  maxInMemorySize: 8

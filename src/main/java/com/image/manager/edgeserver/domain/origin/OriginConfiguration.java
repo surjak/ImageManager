@@ -4,6 +4,7 @@ import com.image.manager.edgeserver.common.converter.BufferedImageConverter;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.jcache.JCacheCacheManager;
@@ -23,7 +24,8 @@ import java.util.stream.Collectors;
 @Configuration
 public class OriginConfiguration {
 
-
+    @Value("${client.maxInMemorySize}")
+    private Integer maxInMemorySize;
 
     @Bean
     public OriginFacade originFacade(OriginProperties originProperties,
@@ -44,6 +46,7 @@ public class OriginConfiguration {
     }
 
     public WebClient initWebClient(int maxNumberOfConnections) {
+        System.out.println("Max in memory size: " + maxInMemorySize + " MB");
         ConnectionProvider connectionProvider = ConnectionProvider.builder("connectionProvider").maxConnections(maxNumberOfConnections)
                 .pendingAcquireMaxCount(500)
                 .pendingAcquireTimeout(Duration.ofSeconds(60)).build();
@@ -52,7 +55,7 @@ public class OriginConfiguration {
         return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()
                 .codecs(configurer -> configurer
                         .defaultCodecs()
-                        .maxInMemorySize(16 * 1024 * 1024))
+                        .maxInMemorySize(maxInMemorySize * 1024 * 1024))
                 .build())
                 .clientConnector(connector)
                 .build();
