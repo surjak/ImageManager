@@ -12,3 +12,14 @@ services:
     volumes:
       - ./prometheus/prometheus-dev.yml:/etc/prometheus/prometheus.yml
     container_name: prometheus
+  node-exporter:
+    image: prom/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro'
+    container_name: node-exporter

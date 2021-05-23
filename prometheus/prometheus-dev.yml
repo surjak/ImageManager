@@ -7,3 +7,7 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['spring-boot:8080']
+  - job_name: "node-exporter"
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['node-exporter:9100']

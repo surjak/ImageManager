@@ -21,6 +21,17 @@ services:
       - JAVA_OPTS=-Xloggc:/data/gc.log -Dclient.maxInMemorySize=8
     networks:
       - edge
+  node-exporter:
+    image: prom/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    ports:
+      - 9100:9100
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro'
+    container_name: node-exporter
 
 networks:
   edge: {}
