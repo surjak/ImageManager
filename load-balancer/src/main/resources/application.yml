@@ -1,3 +1,14 @@
 edge:
   clients-ips:
     - "10.0.0.1:8080"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    health:
+      show-details: 'always'
+
+  metrics:
+    export.prometheus.enabled: true

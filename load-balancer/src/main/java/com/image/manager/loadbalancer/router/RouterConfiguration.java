@@ -31,8 +31,8 @@ public class RouterConfiguration {
                                 )
                                         .flatMap(a -> {
                                             var edgeWebClient = resolver.resolve(a.getT2());
-
                                             var client = edgeWebClient.getWebClient();
+                                            edgeWebClient.incrementCounter();
                                             Flux<DataBuffer> mono = client.get()
                                                     .uri(a.getT2() + "?" + a.getT1())
                                                     .header("Host", a.getT3().firstHeader("Host"))

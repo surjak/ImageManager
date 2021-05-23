@@ -1,5 +1,6 @@
 package com.image.manager.loadbalancer.edgewebclient;
 
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,10 +18,10 @@ public class EdgeWebClientConfiguration {
     }
 
     @Bean
-    public List<EdgeWebClient> edgeWebClients(EdgeWebClientProperties properties) {
+    public List<EdgeWebClient> edgeWebClients(EdgeWebClientProperties properties, PrometheusMeterRegistry mr) {
         return properties.getClientsIps()
                 .stream()
-                .map(EdgeWebClient::fromHost)
+                .map(s -> EdgeWebClient.fromHost(s, mr))
                 .collect(Collectors.toList());
     }
 
