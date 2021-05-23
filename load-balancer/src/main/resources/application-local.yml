@@ -2,14 +2,3 @@ edge:
   clients-ips:
     - "http://localhost:11000"
     - "http://localhost:12000"
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-    health:
-      show-details: 'always'
-
-  metrics:
-    export.prometheus.enabled: true
