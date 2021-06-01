@@ -1,4 +1,4 @@
-FROM openjdk:15
+FROM openjdk:11
 WORKDIR /opt/edgeserver
 COPY . /opt/edgeserver
 EXPOSE 8080
