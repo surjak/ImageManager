@@ -18,7 +18,7 @@ services:
       - /data:/data
     environment:
       - SPRING_PROFILES_ACTIVE=abc
-      - JAVA_OPTS=-Xloggc:/data/gc.log -Dclient.maxInMemorySize=8
+      - JAVA_OPTS=-Xloggc:/data/gc.log -Dclient.maxInMemorySize=8 -Xmx256m -XX:MaxDirectMemorySize=256m -Dio.netty.maxDirectMemory=0
     networks:
       - edge
   node-exporter:
