@@ -1,6 +1,7 @@
 edge:
   clients-ips:
-    - "10.0.0.1:8080"
+    - "http://10.0.0.101:8080"
+    - "http://10.0.0.103:8080"
 
 management:
   endpoints:
