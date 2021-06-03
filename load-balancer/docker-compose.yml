@@ -1,0 +1,6 @@
+version: '3'
+services:
+  load-balancer:
+    image: "aghimagemanager/image_manager:load-balancer"
+    container_name: load-balancer
+    restart: always
