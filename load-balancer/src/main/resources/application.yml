@@ -3,6 +3,9 @@ edge:
     - "http://10.0.0.101:8080"
     - "http://10.0.0.103:8080"
 
+server:
+  port: 8080
+
 management:
   endpoints:
     web:

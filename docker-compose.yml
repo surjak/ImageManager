@@ -1,11 +1,11 @@
 version: '3'
 services:
-  nginx:
-    image: nginx:1.19-alpine
-    network_mode: host
-    volumes:
-      - ./certs:/data/nginx/certs
-      - ./nginx:/etc/nginx/conf.d
+#  nginx:
+#    image: nginx:1.19-alpine
+#    network_mode: host
+#    volumes:
+#      - ./certs:/data/nginx/certs
+#      - ./nginx:/etc/nginx/conf.d
   spring-boot:
     image: "aghimagemanager/image_manager"
     ports:

@@ -23,4 +23,10 @@ public abstract class AbstractRoutingResolver implements RoutingResolver {
         return this.clients.size();
     }
 
+    protected final List<EdgeWebClient> getActiveClients() {
+        return this.clients.stream()
+                .filter(EdgeWebClient::isActive)
+                .collect(Collectors.toList());
+    }
+
 }

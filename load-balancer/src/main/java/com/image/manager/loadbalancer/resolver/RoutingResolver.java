@@ -2,8 +2,10 @@ package com.image.manager.loadbalancer.resolver;
 
 import com.image.manager.loadbalancer.edgewebclient.EdgeWebClient;
 
+import java.util.Optional;
+
 public interface RoutingResolver {
 
-    EdgeWebClient resolve(String filename);
+    Optional<EdgeWebClient> resolve(String filename);
 
 }
