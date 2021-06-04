@@ -7,18 +7,26 @@ import lombok.EqualsAndHashCode;
 import org.springframework.cache.Cache;
 
 @Data
-@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class CachedRequest {
 
     @EqualsAndHashCode.Include
     private final String filename;
     private EdgeWebClient client;
-    private int requestCount;
+    private int requestCount = 1;
+
+    public CachedRequest(String filename, EdgeWebClient client) {
+        this.filename = filename;
+        this.client = client;
+    }
 
     public CachedRequest incrementRequestCount() {
         this.requestCount++;
         return this;
+    }
+
+    public void resetRequestCount() {
+        this.requestCount = 1;
     }
 
 }

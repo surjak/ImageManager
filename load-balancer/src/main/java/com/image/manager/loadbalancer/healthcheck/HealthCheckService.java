@@ -16,9 +16,8 @@ public class HealthCheckService {
 
     private final List<EdgeWebClient> clients;
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 4349)
     public void checkClients() {
-        System.out.println("Requesting healthcheck");
         clients.forEach(this::makeHealthCheckRequest);
     }
 

@@ -1,6 +1,7 @@
 package com.image.manager.loadbalancer.resolver.cachedroundrobin;
 
 import com.image.manager.loadbalancer.edgewebclient.EdgeWebClient;
+import com.image.manager.loadbalancer.healthcheck.HealthStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static com.image.manager.loadbalancer.healthcheck.HealthStatus.HEALTHY;
 
 @Component
 @RequiredArgsConstructor
@@ -29,13 +32,13 @@ public class CachedRoundRobinScheduler {
         var sorted = this.clients.stream()
                 .collect(Collectors.toCollection(toSortedSet));
 
-        var clientWithHighestRequestRate = sorted.first();
-        var clientWithLowestRequestRate = sorted.last();
+        var clientWithHighestRequestRate = sorted.last();
+        var clientWithLowestRequestRate = sorted.first();
 
         long requestDiff = clientWithHighestRequestRate.getRequestCount() - clientWithLowestRequestRate.getRequestCount();
 
-        double ratio = 1D * requestDiff / clientWithLowestRequestRate.getRequestCount();
-        if (requestDiff > REQUEST_THRESHOLD || ratio > REQUEST_THRESHOLD) {
+        double ratio = ((double) requestDiff) / clientWithLowestRequestRate.getRequestCount();
+        if ((requestDiff > REQUEST_THRESHOLD || ratio > REQUEST_RATIO_THRESHOLD) && clientWithLowestRequestRate.getStatus() == HEALTHY) {
             var switchableRequests = resolver.getRequestsByClient(clientWithHighestRequestRate);
 
             var requestsToSwitch = this.getRequestsToSwitch(
@@ -49,6 +52,9 @@ public class CachedRoundRobinScheduler {
                     clientWithHighestRequestRate,
                     clientWithLowestRequestRate
             );
+
+            this.resolver.resetRequestCounters();
+            this.clients.forEach(EdgeWebClient::resetCounter);
         }
     }
 

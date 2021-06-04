@@ -33,30 +33,41 @@ public class CachedRoundRobinRoutingResolver extends AbstractRoutingResolver {
             return Optional.empty();
         }
 
-        var client = requestsByFilename.get(filename).getClient();
-        if(client == null) {
-            client = requestsByFilename.put(filename, nextClient(filename, activeClients)).getClient();
-        } else {
-            requestsByFilename.compute(filename, (k, v) -> v.incrementRequestCount());
+        try {
+            var cachedRequest = requestsByFilename.get(filename);
+            if(cachedRequest == null) {
+                cachedRequest = nextClient(filename, activeClients);
+                requestsByFilename.put(filename, cachedRequest);
+                requestsByClient.put(cachedRequest.getClient(), cachedRequest);
+            } else {
+                requestsByFilename.compute(filename, (k, v) -> v.incrementRequestCount());
+            }
+
+            return Optional.ofNullable(cachedRequest.getClient());
+        } catch (Exception e) {
+            return Optional.ofNullable(nextClient(filename, activeClients).getClient());
         }
 
-        return Optional.ofNullable(client);
     }
 
     private CachedRequest nextClient(String filename, List<EdgeWebClient> activeClients) {
-        return new CachedRequest(filename, activeClients.get((++roundRobinCounter) % activeClients.size()), 1);
+        return new CachedRequest(filename, activeClients.get((++roundRobinCounter) % activeClients.size()));
     }
 
     public List<CachedRequest> getRequestsByClient(EdgeWebClient client) {
         return new ArrayList<>(this.requestsByClient.get(client));
     }
 
-    public void switchRequestsBetweenClients(List<CachedRequest> reuqestsToSwitch, EdgeWebClient from, EdgeWebClient to) {
-        reuqestsToSwitch.forEach(request -> {
+    public void switchRequestsBetweenClients(List<CachedRequest> requestsToSwitch, EdgeWebClient from, EdgeWebClient to) {
+        requestsToSwitch.forEach(request -> {
             request.setClient(to);
             this.requestsByClient.remove(from, request);
             this.requestsByClient.put(to, request);
         });
+    }
+
+    public void resetRequestCounters() {
+        this.requestsByFilename.values().forEach(CachedRequest::resetRequestCount);
     }
 
 }

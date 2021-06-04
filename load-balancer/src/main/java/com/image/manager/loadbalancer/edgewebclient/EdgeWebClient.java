@@ -17,7 +17,7 @@ public class EdgeWebClient {
     private final WebClient webClient;
     private final Counter missCounter;
 
-    private long requestCount;
+    private long requestCount = 1;
     private HealthStatus status;
 
     private EdgeWebClient(String host, WebClient webClient, PrometheusMeterRegistry mr) {
@@ -32,12 +32,11 @@ public class EdgeWebClient {
     }
 
     public void setStatus(HealthStatus status) {
-        System.out.printf("Client related to host %s -> %s\n", this.host, status.name());
         this.status = status;
     }
 
     public void resetCounter() {
-        this.requestCount = 0;
+        this.requestCount = 1;
     }
 
     public boolean isActive() {
