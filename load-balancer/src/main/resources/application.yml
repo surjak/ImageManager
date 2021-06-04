@@ -4,7 +4,7 @@ edge:
     - "http://10.0.0.103:8080"
 
 server:
-  port: 10000
+  port: 8080
 
 management:
   endpoints:

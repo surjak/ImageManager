@@ -40,7 +40,6 @@ public class RouterConfiguration {
                                 )
                                         .flatMap(a -> {
                                             var edgeWebClient = resolver.resolve(a.getT2());
-                                            System.out.println(edgeWebClient);
 
                                             return edgeWebClient
                                                     .map(webClient -> {
