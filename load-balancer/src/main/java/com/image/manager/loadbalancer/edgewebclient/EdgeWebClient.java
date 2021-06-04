@@ -4,7 +4,6 @@ import com.image.manager.loadbalancer.healthcheck.HealthStatus;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Getter
@@ -18,7 +17,7 @@ public class EdgeWebClient {
     private final WebClient webClient;
     private final Counter missCounter;
 
-    private long totalRequests;
+    private long requestCount;
     private HealthStatus status;
 
     private EdgeWebClient(String host, WebClient webClient, PrometheusMeterRegistry mr) {
@@ -29,7 +28,7 @@ public class EdgeWebClient {
 
     public void incrementCounter() {
         missCounter.increment();
-        this.totalRequests++;
+        this.requestCount++;
     }
 
     public void setStatus(HealthStatus status) {
@@ -38,7 +37,7 @@ public class EdgeWebClient {
     }
 
     public void resetCounter() {
-        this.totalRequests = 0;
+        this.requestCount = 0;
     }
 
     public boolean isActive() {
