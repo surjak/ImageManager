@@ -5,6 +5,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.image.manager.loadbalancer.edgewebclient.EdgeWebClient;
 import com.image.manager.loadbalancer.resolver.AbstractRoutingResolver;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.Getter;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -20,9 +22,11 @@ public class CachedRoundRobinRoutingResolver extends AbstractRoutingResolver {
     private final Multimap<EdgeWebClient, CachedRequest> requestsByClient = ArrayListMultimap.create();
 
     private int roundRobinCounter = 0;
+    private final Counter catchCounter;
 
-    public CachedRoundRobinRoutingResolver(List<EdgeWebClient> clients) {
+    public CachedRoundRobinRoutingResolver(List<EdgeWebClient> clients, PrometheusMeterRegistry mr) {
         super(clients);
+        catchCounter = Counter.builder("count.random.client").register(mr);
     }
 
     @Override
@@ -45,6 +49,7 @@ public class CachedRoundRobinRoutingResolver extends AbstractRoutingResolver {
 
             return Optional.ofNullable(cachedRequest.getClient());
         } catch (Exception e) {
+            catchCounter.increment();
             return Optional.ofNullable(nextClient(filename, activeClients).getClient());
         }
 
