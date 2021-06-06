@@ -14,3 +14,14 @@ services:
     restart: always
     environment:
       - JAVA_OPTS=-Xmx256m -XX:MaxDirectMemorySize=256m -Dio.netty.maxDirectMemory=0
+  node-exporter:
+    image: prom/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    ports:
+      - 9100:9100
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro'
+    container_name: node-exporter
