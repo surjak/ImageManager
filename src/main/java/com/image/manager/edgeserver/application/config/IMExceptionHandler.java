@@ -18,6 +18,7 @@ public class IMExceptionHandler implements WebExceptionHandler {
 
     @Override
     public Mono<Void> handle(ServerWebExchange serverWebExchange, Throwable throwable) {
+        ((Exception) throwable).printStackTrace();
         if (throwable instanceof ImageNotFoundException) {
             serverWebExchange.getResponse().setStatusCode(HttpStatus.NOT_FOUND);
             return serverWebExchange.getResponse().setComplete();

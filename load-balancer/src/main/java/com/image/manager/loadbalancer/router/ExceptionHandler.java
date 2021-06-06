@@ -16,7 +16,7 @@ public class ExceptionHandler implements WebExceptionHandler {
 
     @Override
     public Mono<Void> handle(ServerWebExchange serverWebExchange, Throwable throwable) {
-
+        ((Exception) throwable).printStackTrace();
         if (throwable instanceof Exception) {
             serverWebExchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
             return serverWebExchange.getResponse().setComplete();
