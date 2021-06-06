@@ -1,4 +1,4 @@
-FROM openjdk:15
+FROM openjdk:11
 WORKDIR /opt/edgeserver/load-balancer
 COPY . /opt/edgeserver/load-balancer
 EXPOSE 8080
