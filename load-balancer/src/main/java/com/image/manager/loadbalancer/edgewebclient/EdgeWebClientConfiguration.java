@@ -18,10 +18,23 @@ public class EdgeWebClientConfiguration {
     }
 
     @Bean
-    public List<EdgeWebClient> edgeWebClients(EdgeWebClientProperties properties, PrometheusMeterRegistry mr) {
+    @ConfigurationProperties(prefix = "client")
+    public ClientConfig clientConfig() {
+        return new ClientConfig();
+    }
+
+
+
+    @Bean
+    public List<EdgeWebClient> edgeWebClients(EdgeWebClientProperties properties, PrometheusMeterRegistry mr, ClientConfig clientConfig) {
         return properties.getClientsIps()
                 .stream()
-                .map(s -> EdgeWebClient.fromHost(s, mr))
+                .map(s -> EdgeWebClient.fromHost(s, mr,
+                        clientConfig.getMaxInMemorySize(),
+                        clientConfig.getMaxConnections(),
+                        clientConfig.getPendingAcquireMaxCount(),
+                        clientConfig.getPendingAcquireTimeout()
+                        ))
                 .collect(Collectors.toList());
     }
 

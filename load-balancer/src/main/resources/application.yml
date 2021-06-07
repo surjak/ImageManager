@@ -16,3 +16,9 @@ management:
 
   metrics:
     export.prometheus.enabled: true
+
+client:
+  pendingAcquireMaxCount: 500
+  maxConnections: 50
+  pendingAcquireTimeout: 60
+  maxInMemorySize: 8
